@@ -2,6 +2,10 @@
 
 Portfolio personal bilingüe (ES/EN) construido con Astro 7, estático, sin frameworks de UI y con ~3 KB de JavaScript.
 
+- **Temas claro y oscuro:** siguen al sistema operativo, con un selector en la barra de navegación que recuerda la elección.
+- **Tipografía:** SF Pro (fuente del sistema) en dispositivos Apple, sin descargas. En Windows, Android y Linux se descarga Inter como respaldo.
+- **Colores y escala tipográfica:** tokens en `src/styles/global.css`, cada color definido una sola vez con `light-dark()`.
+
 ## Comandos
 
 | Comando        | Acción                                            |

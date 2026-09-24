@@ -1,48 +1,64 @@
 /* ──────────────────────────────────────────────────────────────
-   Design tokens
+   Design tokens — defined once, light and dark via light-dark().
+   The theme follows the OS unless the visitor picks one (data-theme).
    ────────────────────────────────────────────────────────────── */
 :root {
-	color-scheme: dark;
+	color-scheme: light dark;
 
-	--bg: #0a0a0b;
-	--bg-elevated: #111113;
-	--surface: #161619;
-	--surface-hover: #1c1c20;
-	--line: rgb(236 235 231 / 0.08);
-	--line-strong: rgb(236 235 231 / 0.16);
-	--text: #ecebe7;
-	--text-muted: #97958f;
-	--text-dim: #64625e;
-	--accent: #ff6a3d;
-	--accent-soft: rgb(255 106 61 / 0.14);
-	--accent-contrast: #140803;
+	--bg: light-dark(#ffffff, #000000);
+	--bg-alt: light-dark(#f5f5f7, #0c0c0d);
+	--surface: light-dark(#f5f5f7, #161617);
+	--surface-raised: light-dark(#ffffff, #1f1f21);
+	--text: light-dark(#1d1d1f, #f5f5f7);
+	--text-secondary: light-dark(#6e6e73, #a1a1a6);
+	/* Large text only (≥ 3:1 contrast) */
+	--text-tertiary: light-dark(#86868b, #6e6e73);
+	--line: light-dark(#d2d2d7, #38383b);
+	--line-soft: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.1));
+	--accent: light-dark(#0062cc, #3d9cff);
+	--accent-fill: #0a6ce6;
+	--accent-fill-hover: #1e7cf2;
+	--on-accent: #ffffff;
+	--success: light-dark(#1f8a3b, #34c759);
+	--nav-bg: light-dark(rgb(255 255 255 / 0.76), rgb(22 22 23 / 0.76));
+	--shadow-color: light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.85));
 
-	--font-display: var(--font-sans);
+	/*
+	 * SF Pro on Apple devices (system font, nothing to download). Inter is
+	 * only fetched on platforms where the Apple system font does not exist.
+	 */
+	--font-sans: -apple-system, BlinkMacSystemFont, var(--font-inter, 'Helvetica Neue', Arial, sans-serif);
 
-	/* Fluid type scale — display / heading / body / metadata / technical label */
-	--step-display: clamp(3.25rem, 1.2rem + 8.4vw, 10.5rem);
-	--step-h1: clamp(2.5rem, 1.4rem + 4.6vw, 6rem);
-	--step-h2: clamp(1.75rem, 1.2rem + 2.2vw, 3.25rem);
-	--step-h3: clamp(1.25rem, 1.05rem + 0.8vw, 1.75rem);
-	--step-lead: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
-	--step-body: 1rem;
-	--step-meta: 0.875rem;
-	--step-label: 0.6875rem;
+	/* Type scale — hero / headline / title / subtitle / lead / body / small / caption */
+	--fs-hero: clamp(3rem, 1.4rem + 6.6vw, 6.5rem);
+	--fs-headline: clamp(2.25rem, 1.45rem + 3.4vw, 4.5rem);
+	--fs-title: clamp(1.625rem, 1.3rem + 1.4vw, 2.5rem);
+	--fs-subtitle: clamp(1.1875rem, 1.1rem + 0.45vw, 1.5rem);
+	--fs-lead: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
+	--fs-body: 1.0625rem;
+	--fs-small: 0.875rem;
+	--fs-caption: 0.75rem;
 
-	--space-section: clamp(6rem, 4rem + 9vw, 12rem);
-	--gutter: clamp(1rem, 0.5rem + 2.5vw, 3rem);
-	--container: 88rem;
-	--radius-sm: 0.5rem;
-	--radius: 0.875rem;
-	--radius-lg: 1.5rem;
+	--space-section: clamp(6rem, 4rem + 8vw, 11rem);
+	--gutter: clamp(1.25rem, 0.6rem + 2.6vw, 3rem);
+	--container: 80rem;
+	--radius: 1.125rem;
+	--radius-lg: 1.75rem;
 
-	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-	--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+	--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 	--dur-micro: 200ms;
-	--dur-component: 500ms;
-	--dur-section: 900ms;
+	--dur-component: 450ms;
+	--dur-section: 1s;
 
-	--header-height: 4.5rem;
+	--header-height: 3.25rem;
+}
+
+:root[data-theme='light'] {
+	color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
 }
 
 /* ──────────────────────────────────────────────────────────────
@@ -71,8 +87,9 @@ body {
 	background: var(--bg);
 	color: var(--text);
 	font-family: var(--font-sans);
-	font-size: var(--step-body);
-	line-height: 1.6;
+	font-size: var(--fs-body);
+	line-height: 1.47;
+	letter-spacing: -0.016em;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-rendering: optimizeLegibility;
@@ -87,13 +104,10 @@ video {
 	height: auto;
 }
 
-button,
-input {
+button {
 	font: inherit;
 	color: inherit;
-}
-
-button {
+	letter-spacing: inherit;
 	cursor: pointer;
 	background: none;
 	border: 0;
@@ -115,9 +129,9 @@ h1,
 h2,
 h3,
 h4 {
-	font-weight: 500;
-	line-height: 1.05;
-	letter-spacing: -0.035em;
+	font-weight: 600;
+	line-height: 1.08;
+	letter-spacing: -0.022em;
 	text-wrap: balance;
 }
 
@@ -126,14 +140,14 @@ p {
 }
 
 ::selection {
-	background: var(--accent);
-	color: var(--accent-contrast);
+	background: var(--accent-fill);
+	color: var(--on-accent);
 }
 
 :focus-visible {
 	outline: 2px solid var(--accent);
 	outline-offset: 3px;
-	border-radius: 4px;
+	border-radius: 6px;
 }
 
 /* ──────────────────────────────────────────────────────────────
@@ -144,6 +158,17 @@ p {
 	max-width: var(--container);
 	margin-inline: auto;
 	padding-inline: var(--gutter);
+}
+
+.section {
+	position: relative;
+	padding-block: var(--space-section);
+}
+
+/* Alternate band: tiles become white (light) / raised (dark) */
+.section--alt {
+	--surface: var(--surface-raised);
+	background: var(--bg-alt);
 }
 
 .sr-only {
@@ -158,66 +183,53 @@ p {
 	border: 0;
 }
 
-.section {
-	position: relative;
-	padding-block: var(--space-section);
+.muted {
+	color: var(--text-secondary);
 }
 
-/* Technical label: mono, uppercase, tracked. */
-.label {
-	font-family: var(--font-mono);
-	font-size: var(--step-label);
-	font-weight: 500;
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
-	color: var(--text-muted);
-	line-height: 1.4;
+.caption {
+	font-size: var(--fs-caption);
+	color: var(--text-secondary);
+	letter-spacing: -0.005em;
 }
 
-.serif {
-	font-family: var(--font-serif);
-	font-style: italic;
-	font-weight: 400;
-	letter-spacing: -0.01em;
-}
-
-.accent {
-	color: var(--accent);
-}
-
-/* Animated underline link */
+/* Text link with chevron: "Hablemos ›" */
 .link {
-	position: relative;
 	display: inline-flex;
 	align-items: center;
-	gap: 0.4em;
-	background: linear-gradient(currentColor, currentColor) no-repeat 100% 100% / 0 1px;
-	transition:
-		background-size var(--dur-component) var(--ease-out),
-		color var(--dur-micro) var(--ease-out);
+	gap: 0.25em;
+	color: var(--accent);
+	text-decoration: underline;
+	text-decoration-color: transparent;
+	text-underline-offset: 0.2em;
+	transition: text-decoration-color var(--dur-micro) var(--ease-out);
 }
 
-.link:hover,
-.link:focus-visible {
-	color: var(--text);
-	background-position: 0 100%;
-	background-size: 100% 1px;
+.link:hover {
+	text-decoration-color: currentColor;
 }
 
-.link .arrow {
+.link .chevron {
 	transition: transform var(--dur-micro) var(--ease-out);
 }
 
-.link:hover .arrow {
-	transform: translate(2px, -2px);
+.link:hover .chevron {
+	transform: translateX(3px);
+}
+
+/* Rounded tile used across sections */
+.tile {
+	border-radius: var(--radius-lg);
+	background: var(--surface);
+	padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
 }
 
 /* ──────────────────────────────────────────────────────────────
-   Reveal system — only active when JS is available (`.js` on <html>)
+   Reveal — only active when JS is available (`.js` on <html>)
    ────────────────────────────────────────────────────────────── */
 .js [data-reveal] {
 	opacity: 0;
-	transform: translate3d(0, 2rem, 0);
+	transform: translate3d(0, 2.5rem, 0);
 	transition:
 		opacity var(--dur-section) var(--ease-out),
 		transform var(--dur-section) var(--ease-out);
@@ -229,7 +241,7 @@ p {
 }
 
 .js [data-reveal='scale'] {
-	transform: scale(0.96) translate3d(0, 1.5rem, 0);
+	transform: scale(0.94);
 }
 
 .js [data-reveal].is-visible {
@@ -237,29 +249,15 @@ p {
 	transform: none;
 }
 
-/* Masked reveal for large headings: text slides up from behind a clip.
-   The inner `.mask` span moves, so the observed element keeps its box. */
-.js [data-reveal='mask'] {
-	opacity: 1;
-	transform: none;
-	overflow: clip;
-	padding-bottom: 0.08em;
+/* Language switch cross-fade (native, no JS) */
+@view-transition {
+	navigation: auto;
 }
 
-.js [data-reveal='mask'] > .mask {
-	display: inline-block;
-	transform: translate3d(0, 105%, 0);
-	transition: transform var(--dur-section) var(--ease-out);
-	transition-delay: calc(var(--reveal-delay, 0) * 1ms);
+html.is-locked {
+	overflow: hidden;
 }
 
-.js [data-reveal='mask'].is-visible > .mask {
-	transform: none;
-}
-
-/* ──────────────────────────────────────────────────────────────
-   Reduced motion: keep everything visible and static
-   ────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
 	html {
 		scroll-behavior: auto;
@@ -274,100 +272,8 @@ p {
 		transition-delay: 0ms !important;
 	}
 
-	.js [data-reveal],
-	.js [data-reveal='mask'] > .mask {
+	.js [data-reveal] {
 		opacity: 1;
 		transform: none;
 	}
-}
-
-/* ──────────────────────────────────────────────────────────────
-   Atmosphere: film grain + cross-document language transition
-   ────────────────────────────────────────────────────────────── */
-body::after {
-	content: '';
-	position: fixed;
-	inset: 0;
-	z-index: 100;
-	pointer-events: none;
-	opacity: 0.05;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-html.is-locked {
-	overflow: hidden;
-}
-
-@view-transition {
-	navigation: auto;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-	animation-duration: 400ms;
-	animation-timing-function: var(--ease-out);
-}
-
-/* ──────────────────────────────────────────────────────────────
-   Custom cursor (created by src/scripts/cursor.ts on fine pointers)
-   ────────────────────────────────────────────────────────────── */
-.cursor {
-	position: fixed;
-	top: 0;
-	left: 0;
-	z-index: 90;
-	pointer-events: none;
-	opacity: 0;
-	transition: opacity var(--dur-micro) var(--ease-out);
-}
-
-.cursor.is-visible {
-	opacity: 1;
-}
-
-.cursor::before {
-	content: '';
-	position: absolute;
-	width: 2.25rem;
-	height: 2.25rem;
-	translate: -50% -50%;
-	border: 1px solid rgb(236 235 231 / 0.35);
-	border-radius: 50%;
-	transition:
-		scale var(--dur-component) var(--ease-out),
-		background-color var(--dur-component) var(--ease-out),
-		border-color var(--dur-component) var(--ease-out);
-}
-
-.cursor.is-hover::before {
-	scale: 1.6;
-	border-color: var(--accent);
-	background-color: var(--accent-soft);
-}
-
-.cursor.is-pressed::before {
-	scale: 0.8;
-}
-
-.cursor.has-label::before {
-	scale: 2.6;
-	border-color: transparent;
-	background-color: var(--accent);
-}
-
-.cursor__label {
-	position: absolute;
-	translate: -50% -50%;
-	font-family: var(--font-mono);
-	font-size: var(--step-label);
-	letter-spacing: 0.12em;
-	text-transform: uppercase;
-	color: var(--accent-contrast);
-	white-space: nowrap;
-	opacity: 0;
-	transition: opacity var(--dur-micro) var(--ease-out);
-}
-
-.cursor.has-label .cursor__label {
-	opacity: 1;
 }

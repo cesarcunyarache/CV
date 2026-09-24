@@ -1,5 +1,6 @@
 ---
 import LanguageSwitcher from './LanguageSwitcher.astro';
+import ThemeToggle from './ThemeToggle.astro';
 import { localePath, type Locale } from '../../i18n/config';
 import type { Content } from '../../data';
 
@@ -12,26 +13,19 @@ const { locale, content } = Astro.props;
 const { data, t } = content;
 const home = localePath(locale);
 const items = t.navItems.map((id) => ({ id, label: t.nav[id], href: `${home}#${id}` }));
-const [firstName, lastName] = data.profile.shortName.split(' ');
 ---
 
-<div class="header-sentinel" data-header-sentinel aria-hidden="true"></div>
-<header class="header" data-header>
-	<div class="header__bar">
-		<a class="header__brand" href={`${home}#top`}>
-			<span class="header__mark" aria-hidden="true">{firstName.charAt(0)}</span>
-			<span class="header__name">
-				<span>{firstName}</span>
-				<span class="header__name-rest">{lastName}</span>
-			</span>
-		</a>
+<div class="nav-sentinel" data-header-sentinel aria-hidden="true"></div>
+<header class="nav" data-header>
+	<div class="nav__bar container">
+		<a class="nav__brand" href={`${home}#top`}>{data.profile.shortName}</a>
 
-		<nav class="header__nav" aria-label={t.a11y.mainNav}>
-			<ul class="header__list">
+		<nav class="nav__links" aria-label={t.a11y.mainNav}>
+			<ul>
 				{
 					items.map((item) => (
 						<li>
-							<a class="header__link" href={item.href} data-nav-link>
+							<a class="nav__link" href={item.href} data-nav-link>
 								{item.label}
 							</a>
 						</li>
@@ -40,10 +34,11 @@ const [firstName, lastName] = data.profile.shortName.split(' ');
 			</ul>
 		</nav>
 
-		<div class="header__actions">
+		<div class="nav__actions">
 			<LanguageSwitcher current={locale} label={t.a11y.languageSwitcher} />
+			<ThemeToggle label={t.a11y.themeToggle} />
 			<button
-				class="header__toggle"
+				class="nav__toggle"
 				type="button"
 				aria-expanded="false"
 				aria-controls="mobile-menu"
@@ -52,268 +47,185 @@ const [firstName, lastName] = data.profile.shortName.split(' ');
 				data-label-open={t.a11y.openMenu}
 				data-label-close={t.a11y.closeMenu}
 			>
-				<span class="header__toggle-line" aria-hidden="true"></span>
-				<span class="header__toggle-line" aria-hidden="true"></span>
+				<span class="nav__toggle-line" aria-hidden="true"></span>
+				<span class="nav__toggle-line" aria-hidden="true"></span>
 			</button>
 		</div>
 	</div>
 
-	<div class="header__menu" id="mobile-menu">
+	<div class="nav__menu" id="mobile-menu">
 		<nav aria-label={t.a11y.mainNav}>
-			<ol class="header__menu-list">
+			<ul>
 				{
 					items.map((item, index) => (
 						<li style={`--i: ${index}`}>
-							<a class="header__menu-link" href={item.href} data-nav-link>
-								<span class="label">{String(index + 1).padStart(2, '0')}</span>
+							<a class="nav__menu-link" href={item.href} data-nav-link>
 								{item.label}
 							</a>
 						</li>
 					))
 				}
-			</ol>
+			</ul>
 		</nav>
 	</div>
 </header>
 
 <style>
-	.header-sentinel {
+	.nav-sentinel {
 		position: absolute;
 		top: 0;
-		height: 4rem;
 		width: 1px;
+		height: 2rem;
 	}
 
-	.header {
+	.nav {
 		position: fixed;
 		inset: 0 0 auto;
 		z-index: 50;
-		padding: 1rem var(--gutter);
-		pointer-events: none;
 	}
 
-	.header__bar {
+	.nav__bar {
 		position: relative;
 		z-index: 2;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 1rem;
-		max-width: calc(var(--container) - 2 * var(--gutter));
-		margin-inline: auto;
-		padding: 0.375rem 0.375rem 0.375rem 0.5rem;
-		border: 1px solid transparent;
-		border-radius: 999px;
-		pointer-events: auto;
-		transition:
-			max-width var(--dur-section) var(--ease-out),
-			background-color var(--dur-component) var(--ease-out),
-			border-color var(--dur-component) var(--ease-out);
+		height: var(--header-height);
 	}
 
-	/* Floating pill once the user scrolls */
-	.header.is-scrolled .header__bar,
-	.header.is-menu-open .header__bar {
-		max-width: 46rem;
-		background: rgb(17 17 19 / 0.72);
-		border-color: var(--line);
-		backdrop-filter: blur(16px) saturate(140%);
-		-webkit-backdrop-filter: blur(16px) saturate(140%);
+	/* Translucent bar spanning the full width */
+	.nav::before {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		z-index: 1;
+		height: var(--header-height);
+		background: var(--nav-bg);
+		backdrop-filter: saturate(180%) blur(20px);
+		-webkit-backdrop-filter: saturate(180%) blur(20px);
+		box-shadow: 0 1px 0 transparent;
+		transition: box-shadow var(--dur-component) var(--ease-out);
 	}
 
-	.header__brand {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.75rem;
-		min-height: 2.5rem;
-		font-weight: 500;
+	.nav:global(.is-scrolled)::before {
+		box-shadow: 0 1px 0 var(--line-soft);
+	}
+
+	.nav__brand {
+		font-size: 1.0625rem;
+		font-weight: 600;
 		letter-spacing: -0.02em;
 	}
 
-	.header__mark {
-		display: grid;
-		place-items: center;
-		width: 2.25rem;
-		height: 2.25rem;
-		border-radius: 50%;
-		background: var(--text);
-		color: var(--bg);
-		font-family: var(--font-serif);
-		font-style: italic;
-		font-size: 1.35rem;
-		line-height: 1;
-		transition: transform var(--dur-component) var(--ease-out);
-	}
-
-	.header__brand:hover .header__mark {
-		transform: rotate(-12deg) scale(1.05);
-	}
-
-	.header__name {
-		display: inline-flex;
-		gap: 0.3em;
-	}
-
-	.header__name-rest {
-		color: var(--text-muted);
-		transition:
-			opacity var(--dur-component) var(--ease-out),
-			width var(--dur-component) var(--ease-out);
-	}
-
-	.header.is-scrolled .header__name-rest {
+	.nav__links {
 		display: none;
 	}
 
-	.header__list {
-		display: none;
-	}
-
-	.header__link {
-		position: relative;
-		display: inline-flex;
-		align-items: center;
-		min-height: 2.5rem;
-		padding-inline: 0.9rem;
-		border-radius: 999px;
-		font-size: var(--step-meta);
-		color: var(--text-muted);
-		transition:
-			color var(--dur-micro) var(--ease-out),
-			background-color var(--dur-micro) var(--ease-out);
-	}
-
-	.header__link:hover {
-		color: var(--text);
-		background: rgb(255 255 255 / 0.05);
-	}
-
-	.header__link[aria-current] {
-		color: var(--text);
-	}
-
-	.header__link::after {
-		content: '';
-		position: absolute;
-		left: 50%;
-		bottom: 0.3rem;
-		width: 4px;
-		height: 4px;
-		border-radius: 50%;
-		background: var(--accent);
-		translate: -50% 0;
-		scale: 0;
-		transition: scale var(--dur-component) var(--ease-out);
-	}
-
-	.header__link[aria-current]::after {
-		scale: 1;
-	}
-
-	.header__actions {
+	.nav__links ul {
 		display: flex;
-		align-items: center;
 		gap: 0.25rem;
 	}
 
-	.header__toggle {
-		display: grid;
-		place-content: center;
-		gap: 6px;
-		width: 2.75rem;
-		height: 2.75rem;
-		border-radius: 50%;
-		background: rgb(255 255 255 / 0.06);
+	.nav__link {
+		display: inline-flex;
+		align-items: center;
+		min-height: 2.75rem;
+		padding-inline: 0.85rem;
+		font-size: var(--fs-caption);
+		color: var(--text-secondary);
+		transition: color var(--dur-micro) var(--ease-out);
 	}
 
-	.header__toggle-line {
+	.nav__link:hover,
+	.nav__link[aria-current] {
+		color: var(--text);
+	}
+
+	.nav__actions {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.nav__toggle {
+		display: grid;
+		place-content: center;
+		gap: 7px;
+		width: 2.75rem;
+		height: 2.75rem;
+	}
+
+	.nav__toggle-line {
 		display: block;
-		width: 1.1rem;
+		width: 1.05rem;
 		height: 1.5px;
+		border-radius: 1px;
 		background: currentColor;
 		transition: transform var(--dur-component) var(--ease-out);
 	}
 
-	.header.is-menu-open .header__toggle-line:first-child {
-		transform: translateY(3.75px) rotate(45deg);
+	.nav:global(.is-menu-open) .nav__toggle-line:first-child {
+		transform: translateY(4.25px) rotate(45deg);
 	}
 
-	.header.is-menu-open .header__toggle-line:last-child {
-		transform: translateY(-3.75px) rotate(-45deg);
+	.nav:global(.is-menu-open) .nav__toggle-line:last-child {
+		transform: translateY(-4.25px) rotate(-45deg);
 	}
 
 	/* Mobile full-screen menu */
-	.header__menu {
+	.nav__menu {
 		position: fixed;
 		inset: 0;
 		z-index: 1;
-		display: flex;
-		align-items: flex-end;
-		padding: 6rem var(--gutter) 3rem;
+		padding: calc(var(--header-height) + 1.5rem) var(--gutter) 2rem;
 		background: var(--bg);
 		visibility: hidden;
 		opacity: 0;
-		pointer-events: none;
 		transition:
 			opacity var(--dur-component) var(--ease-out),
 			visibility 0s linear var(--dur-component);
 	}
 
-	.header.is-menu-open .header__menu {
+	.nav:global(.is-menu-open) .nav__menu {
 		visibility: visible;
 		opacity: 1;
-		pointer-events: auto;
 		transition: opacity var(--dur-component) var(--ease-out);
 	}
 
-	.header__menu nav {
-		width: 100%;
-	}
-
-	.header__menu-list li {
-		border-top: 1px solid var(--line);
+	.nav__menu li {
 		opacity: 0;
-		transform: translateY(1rem);
+		transform: translateY(-0.5rem);
 		transition:
 			opacity var(--dur-component) var(--ease-out),
 			transform var(--dur-component) var(--ease-out);
-		transition-delay: calc(var(--i) * 60ms + 100ms);
+		transition-delay: calc(var(--i) * 40ms + 80ms);
 	}
 
-	.header.is-menu-open .header__menu-list li {
+	.nav:global(.is-menu-open) .nav__menu li {
 		opacity: 1;
 		transform: none;
 	}
 
-	.header__menu-link {
-		display: flex;
-		align-items: baseline;
-		gap: 1rem;
-		padding-block: 1rem;
-		font-size: clamp(2rem, 8vw, 3rem);
-		font-weight: 500;
-		letter-spacing: -0.04em;
-		line-height: 1.1;
+	.nav__menu-link {
+		display: block;
+		padding-block: 0.6rem;
+		font-size: 1.75rem;
+		font-weight: 600;
+		letter-spacing: -0.025em;
 	}
 
-	.header__menu-link[aria-current] {
-		color: var(--accent);
+	.nav__menu-link[aria-current] {
+		color: var(--text-secondary);
 	}
 
 	@media (min-width: 48rem) {
-		.header__list {
-			display: flex;
-			gap: 0.125rem;
+		.nav__links {
+			display: block;
 		}
 
-		.header__toggle,
-		.header__menu {
-			display: none;
-		}
-	}
-
-	@media (max-width: 29.99rem) {
-		.header__name-rest {
+		.nav__toggle,
+		.nav__menu {
 			display: none;
 		}
 	}

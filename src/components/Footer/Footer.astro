@@ -1,5 +1,4 @@
 ---
-import Icon from '../ui/Icon.astro';
 import type { Content } from '../../data';
 
 interface Props {
@@ -12,20 +11,15 @@ const year = new Date().getFullYear();
 
 <footer class="footer">
 	<div class="footer__inner container">
-		<p class="footer__name">
-			© {year} {data.profile.name}
-		</p>
-		<p class="footer__meta label">{t.footer.builtWith}</p>
-		<a class="footer__top link" href="#top">
-			{t.a11y.backToTop}
-			<Icon name="arrow-up-right" size={14} class="arrow" />
-		</a>
+		<p>© {year} {data.profile.name}</p>
+		<p>{t.footer.builtWith}</p>
+		<a class="footer__top" href="#top">{t.a11y.backToTop}</a>
 	</div>
 </footer>
 
 <style>
 	.footer {
-		border-top: 1px solid var(--line);
+		background: var(--bg-alt);
 	}
 
 	.footer__inner {
@@ -33,13 +27,20 @@ const year = new Date().getFullYear();
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
-		gap: 1rem 2rem;
-		padding-block: 2rem;
-		font-size: var(--step-meta);
-		color: var(--text-muted);
+		gap: 0.5rem 2rem;
+		padding-block: 1.5rem;
+		font-size: var(--fs-caption);
+		color: var(--text-secondary);
 	}
 
 	.footer__top {
+		display: inline-flex;
+		align-items: center;
 		min-height: 2.75rem;
+		color: var(--text);
+	}
+
+	.footer__top:hover {
+		text-decoration: underline;
 	}
 </style>

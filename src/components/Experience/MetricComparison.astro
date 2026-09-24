@@ -15,119 +15,119 @@ const ratio = metric.after / metric.before;
 const reduction = new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 1 }).format(1 - ratio);
 ---
 
-<div class="metric" data-reveal style={`--ratio: ${ratio}`}>
-	<div class="metric__head">
-		<h4 class="metric__label label">{metric.label}</h4>
-		<p class="metric__delta">−{reduction} <span>{t.experience.reduction}</span></p>
-	</div>
+<div class="metric tile" data-reveal style={`--ratio: ${ratio}`}>
+	<h4 class="metric__label">{metric.label}</h4>
 
 	<p class="metric__value">
-		<span class="sr-only">{t.experience.before}: {metric.before} {metric.unit}. {t.experience.after}:</span>
+		<span class="sr-only">{t.experience.before}: {metric.before} {metric.unit}. {t.experience.after}: {metric.after} {metric.unit}.</span>
+		<span class="metric__before" aria-hidden="true">{metric.before}</span>
+		<span class="metric__arrow" aria-hidden="true">→</span>
 		<span class="metric__number" aria-hidden="true" data-count-from={metric.before}>{metric.after}</span>
-		<span class="sr-only">{metric.after}</span>
-		<span class="metric__unit">{metric.unit}</span>
+		<span class="metric__unit" aria-hidden="true">{metric.unit}</span>
 	</p>
+
+	<p class="metric__delta">−{reduction} {t.experience.reduction}</p>
 
 	<div class="metric__bars" aria-hidden="true">
 		<div class="metric__row">
-			<span class="metric__row-label">{t.experience.before}</span>
-			<span class="metric__bar metric__bar--before"></span>
-			<span class="metric__row-value">{metric.before}</span>
+			<span>{t.experience.before}</span>
+			<span class="metric__bar"></span>
 		</div>
 		<div class="metric__row">
-			<span class="metric__row-label">{t.experience.after}</span>
+			<span>{t.experience.after}</span>
 			<span class="metric__bar metric__bar--after"></span>
-			<span class="metric__row-value">{metric.after}</span>
 		</div>
 	</div>
 </div>
 
 <style>
 	.metric {
-		display: grid;
-		gap: 1.25rem;
-		padding: clamp(1.25rem, 1rem + 1vw, 2rem);
-		border: 1px solid var(--line);
-		border-radius: var(--radius-lg);
-		background: var(--surface);
-	}
-
-	.metric__head {
 		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-		gap: 1rem;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
 	.metric__label {
-		font-weight: 500;
-	}
-
-	.metric__delta {
-		font-family: var(--font-mono);
-		font-size: var(--step-meta);
-		color: var(--accent);
-	}
-
-	.metric__delta span {
-		color: var(--text-muted);
+		font-size: var(--fs-lead);
+		letter-spacing: -0.02em;
 	}
 
 	.metric__value {
 		display: flex;
 		align-items: baseline;
-		gap: 0.5rem;
+		flex-wrap: wrap;
+		gap: 0.4rem 0.75rem;
+		margin-top: 1rem;
 		line-height: 1;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.metric__before,
+	.metric__arrow {
+		font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.75rem);
+		font-weight: 600;
+		letter-spacing: -0.03em;
+		color: var(--text-secondary);
+	}
+
+	.metric__before {
+		text-decoration: line-through;
+		text-decoration-thickness: 2px;
 	}
 
 	.metric__number {
 		font-size: clamp(3.5rem, 2.5rem + 4vw, 6rem);
-		font-weight: 500;
-		letter-spacing: -0.05em;
-		font-variant-numeric: tabular-nums;
+		font-weight: 700;
+		letter-spacing: -0.045em;
+		background: linear-gradient(135deg, #3d8bff, var(--accent-fill));
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
 	}
 
 	.metric__unit {
-		font-family: var(--font-mono);
-		color: var(--text-muted);
+		font-size: var(--fs-subtitle);
+		font-weight: 600;
+		color: var(--text-secondary);
+	}
+
+	.metric__delta {
+		font-size: var(--fs-body);
+		font-weight: 600;
+		color: var(--accent);
 	}
 
 	.metric__bars {
 		display: grid;
 		gap: 0.6rem;
+		margin-top: auto;
+		padding-top: 1.5rem;
 	}
 
 	.metric__row {
 		display: grid;
-		grid-template-columns: 4.5rem 1fr 2.5rem;
+		grid-template-columns: 4.5rem 1fr;
 		align-items: center;
 		gap: 0.75rem;
-		font-family: var(--font-mono);
-		font-size: var(--step-label);
-		letter-spacing: 0.06em;
-		color: var(--text-muted);
-	}
-
-	.metric__row-value {
-		text-align: right;
-		font-variant-numeric: tabular-nums;
+		font-size: var(--fs-caption);
+		color: var(--text-secondary);
 	}
 
 	.metric__bar {
-		height: 0.5rem;
-		border-radius: 999px;
-		background: var(--line-strong);
+		height: 6px;
+		border-radius: 3px;
+		background: var(--line);
 		transform-origin: left;
 	}
 
 	/* The "after" bar shrinks from the "before" length to its real ratio */
 	.metric__bar--after {
-		background: var(--accent);
+		background: var(--accent-fill);
 		transform: scaleX(var(--ratio));
 		transition: transform 1.6s var(--ease-out) 300ms;
 	}
 
-	:global(.js) .metric:not(.is-visible) .metric__bar--after {
+	:global(.js) .metric:not(:global(.is-visible)) .metric__bar--after {
 		transform: scaleX(1);
 	}
 </style>

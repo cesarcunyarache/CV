@@ -16,10 +16,45 @@ const links = [
 	project.liveUrl && { href: project.liveUrl, label: t.work.live },
 	project.repositoryUrl && { href: project.repositoryUrl, label: t.work.repository },
 ].filter(Boolean) as { href: string; label: string }[];
-const meta = [project.year, project.category, project.role].filter(Boolean);
+const meta = [project.category, project.year].filter(Boolean).join(' · ');
 ---
 
-<article class="card" aria-labelledby={titleId} data-tilt data-cursor={links.length ? t.work.cursorLabel : undefined}>
+<article class="card" aria-labelledby={titleId}>
+	<div class="card__body">
+		<p class="card__meta">
+			{meta}
+			{project.placeholder && <span class="card__badge">{t.work.placeholder}</span>}
+		</p>
+		<h3 class="card__title" id={titleId}>{project.title}</h3>
+		<p class="card__description">{project.description}</p>
+
+		{
+			project.highlights && project.highlights.length > 0 && (
+				<ul class="card__highlights">
+					{project.highlights.map((highlight) => (
+						<li>{highlight}</li>
+					))}
+				</ul>
+			)
+		}
+
+		<p class="card__tech">{project.technologies.join(' · ')}</p>
+
+		{
+			links.length > 0 && (
+				<div class="card__links">
+					{links.map((link) => (
+						<a class="link" href={link.href} target="_blank" rel="noopener noreferrer">
+							{link.label}
+							<span class="sr-only">{t.a11y.opensInNewTab}</span>
+							<Icon name="chevron-right" size={16} class="chevron" />
+						</a>
+					))}
+				</div>
+			)
+		}
+	</div>
+
 	<div class="card__media">
 		{
 			project.image ? (
@@ -28,233 +63,104 @@ const meta = [project.year, project.category, project.role].filter(Boolean);
 					src={project.image}
 					alt={project.imageAlt ?? ''}
 					widths={[480, 800, 1200]}
-					sizes="(min-width: 64rem) 42vw, 100vw"
+					sizes="(min-width: 64rem) 40vw, 100vw"
 					loading="lazy"
 				/>
 			) : (
-				<ProjectPreview index={index} category={project.category} technologies={project.technologies} />
+				<ProjectPreview index={index} technologies={project.technologies} />
 			)
 		}
-
-		<div class="card__badges">
-			{project.placeholder && <span class="card__badge card__badge--placeholder">{t.work.placeholder}</span>}
-			{project.featured && !project.placeholder && <span class="card__badge">{t.work.featured}</span>}
-		</div>
-
-		{
-			project.highlights && project.highlights.length > 0 && (
-				<ul class="card__highlights">
-					{project.highlights.map((highlight) => (
-						<li>
-							<Icon name="arrow-right" size={14} />
-							{highlight}
-						</li>
-					))}
-				</ul>
-			)
-		}
-	</div>
-
-	<div class="card__body">
-		<p class="card__meta label">{meta.join(' · ')}</p>
-		<h3 class="card__title" id={titleId}>{project.title}</h3>
-		<p class="card__description">{project.description}</p>
-
-		<div class="card__footer">
-			<ul class="card__tech" aria-label={t.nav.stack}>
-				{project.technologies.map((technology) => <li>{technology}</li>)}
-			</ul>
-			{
-				links.length > 0 && (
-					<div class="card__links">
-						{links.map((link) => (
-							<a class="link" href={link.href} target="_blank" rel="noopener noreferrer">
-								{link.label}
-								<span class="sr-only">{t.a11y.opensInNewTab}</span>
-								<Icon name="arrow-up-right" size={14} class="arrow" />
-							</a>
-						))}
-					</div>
-				)
-			}
-		</div>
 	</div>
 </article>
 
 <style>
 	.card {
-		--rx: 0deg;
-		--ry: 0deg;
-
-		position: relative;
-		display: grid;
-		grid-template-rows: auto 1fr;
+		display: flex;
+		flex-direction: column;
 		height: 100%;
-		border: 1px solid var(--line);
 		border-radius: var(--radius-lg);
 		background: var(--surface);
 		overflow: hidden;
-		transform: perspective(1200px) rotateX(var(--rx)) rotateY(var(--ry));
-		transition:
-			transform var(--dur-component) var(--ease-out),
-			border-color var(--dur-component) var(--ease-out);
+		transition: transform var(--dur-component) var(--ease-out);
 	}
 
-	.card:hover,
-	.card:focus-within {
-		border-color: var(--line-strong);
+	.card__body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+		padding: clamp(1.75rem, 1.25rem + 1.5vw, 2.75rem) clamp(1.5rem, 1rem + 1.5vw, 2.75rem) 0;
+	}
+
+	.card__meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem;
+		font-size: var(--fs-small);
+		font-weight: 600;
+		color: var(--text-secondary);
+	}
+
+	.card__badge {
+		padding: 0.1rem 0.55rem;
+		border-radius: 999px;
+		background: light-dark(#fff4d6, #3a2f12);
+		color: light-dark(#8a5a00, #ffcf5c);
+		font-size: var(--fs-caption);
+	}
+
+	.card__title {
+		font-size: var(--fs-title);
+		letter-spacing: -0.025em;
+	}
+
+	.card__description {
+		max-width: 44ch;
+		font-size: var(--fs-body);
+		color: var(--text-secondary);
+	}
+
+	.card__highlights {
+		display: grid;
+		gap: 0.3rem;
+		font-size: var(--fs-small);
+	}
+
+	.card__highlights li::before {
+		content: '— ';
+		color: var(--text-secondary);
+	}
+
+	.card__tech {
+		font-size: var(--fs-small);
+		color: var(--text-secondary);
+	}
+
+	.card__links {
+		display: flex;
+		gap: 1.5rem;
 	}
 
 	.card__media {
 		position: relative;
-		aspect-ratio: 16 / 10;
+		flex: 1;
+		min-height: 14rem;
+		margin-top: 1.5rem;
 		overflow: hidden;
-		border-bottom: 1px solid var(--line);
 	}
 
 	.card__image {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		scale: 1.06;
-		transition:
-			translate var(--dur-section) var(--ease-out),
-			scale var(--dur-section) var(--ease-out);
+		transition: transform var(--dur-section) var(--ease-out);
 	}
 
-	.card:hover .card__image {
-		scale: 1.1;
-		translate: calc((50% - var(--mx, 50%)) * 0.06) calc((50% - var(--my, 50%)) * 0.06);
-	}
-
-	.card:hover :global(.preview__diagram) {
-		transform: translate3d(calc((50% - var(--mx, 50%)) * 0.08), calc((50% - var(--my, 50%)) * 0.08), 0);
-	}
-
-	.card:hover :global(.preview__index) {
-		transform: translateY(-0.1em);
-	}
-
-	.card__badges {
-		position: absolute;
-		top: 1rem;
-		right: 1rem;
-		display: flex;
-		gap: 0.5rem;
-	}
-
-	.card__badge {
-		font-family: var(--font-mono);
-		font-size: 0.625rem;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		padding: 0.3rem 0.6rem;
-		border-radius: 999px;
-		background: rgb(10 10 11 / 0.7);
-		border: 1px solid var(--line-strong);
-	}
-
-	.card__badge--placeholder {
-		color: #fbbf24;
-		border-color: rgb(251 191 36 / 0.35);
-	}
-
-	/* Secondary info slides in over the preview on hover / focus */
-	.card__highlights {
-		position: absolute;
-		inset: auto 0 0;
-		display: grid;
-		gap: 0.4rem;
-		padding: 2.5rem 1.25rem 1.25rem;
-		font-size: var(--step-meta);
-		background: linear-gradient(transparent, rgb(10 10 11 / 0.92) 40%);
-	}
-
-	.card__highlights li {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.card__highlights :global(svg) {
-		color: var(--accent);
-		flex-shrink: 0;
-	}
-
+	/* Media lifts slightly on hover */
 	@media (hover: hover) {
-		.card__highlights {
-			opacity: 0;
-			transform: translateY(1rem);
-			transition:
-				opacity var(--dur-component) var(--ease-out),
-				transform var(--dur-component) var(--ease-out);
-		}
-
-		.card:hover .card__highlights,
-		.card:focus-within .card__highlights {
-			opacity: 1;
-			transform: none;
-		}
-	}
-
-	.card__body {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-		padding: clamp(1.25rem, 1rem + 1vw, 2rem);
-	}
-
-	.card__meta {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-
-	.card__title {
-		font-size: var(--step-h3);
-		letter-spacing: -0.03em;
-	}
-
-	.card__description {
-		color: var(--text-muted);
-		font-size: var(--step-meta);
-		max-width: 48ch;
-	}
-
-	.card__footer {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		margin-top: auto;
-		padding-top: 1rem;
-	}
-
-	.card__tech {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4rem;
-	}
-
-	.card__tech li {
-		font-family: var(--font-mono);
-		font-size: 0.6875rem;
-		padding: 0.3rem 0.6rem;
-		border-radius: 999px;
-		border: 1px solid var(--line);
-		color: var(--text-muted);
-	}
-
-	.card__links {
-		display: flex;
-		gap: 1.25rem;
-		font-size: var(--step-meta);
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.card {
-			transform: none;
+		.card:hover .card__image,
+		.card:hover :global(.preview__diagram) {
+			transform: scale(1.04);
 		}
 	}
 </style>

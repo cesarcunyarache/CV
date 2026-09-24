@@ -1,48 +1,28 @@
 ---
-import TechTile from './TechTile.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import type { Content } from '../../data';
 
 interface Props {
 	content: Content;
-	index: number;
 }
 
-const { content, index } = Astro.props;
-const { data, t } = content;
-
+const { data, t } = Astro.props.content;
 const technologyGroups = data.skills.filter((group) => group.kind === 'technologies');
 const conceptGroups = data.skills.filter((group) => group.kind === 'concepts');
-
-// Continuous numbering across groups, like a periodic table.
-let counter = 0;
-const tiles = technologyGroups.map((group) => ({
-	...group,
-	items: group.items.map((item) => ({ ...item, number: ++counter })),
-}));
 ---
 
 <section class="skills section" id="stack" aria-labelledby="stack-title">
 	<div class="container">
-		<SectionHeading
-			index={index}
-			label={t.nav.stack}
-			title={t.sectionTitles.stack}
-			intro={t.stack.intro}
-			id="stack-title"
-		/>
+		<SectionHeading title={t.headings.stack.title} subtitle={t.headings.stack.subtitle} id="stack-title" />
 
-		<div class="skills__groups">
+		<div class="skills__bento" data-reveal-group>
 			{
-				tiles.map((group) => (
-					<div class="skills__group">
-						<h3 class="skills__group-title label" data-reveal="fade">
-							{group.title}
-							<span class="skills__count">{String(group.items.length).padStart(2, '0')}</span>
-						</h3>
-						<ul class="skills__tiles" data-reveal-group>
+				technologyGroups.map((group) => (
+					<div class="skills__group tile" data-reveal>
+						<h3 class="skills__group-title">{group.title}</h3>
+						<ul class="skills__tech">
 							{group.items.map((item) => (
-								<TechTile name={item.name} symbol={item.symbol} number={item.number} group={group.title} />
+								<li>{item}</li>
 							))}
 						</ul>
 					</div>
@@ -50,127 +30,116 @@ const tiles = technologyGroups.map((group) => ({
 			}
 		</div>
 
+		<h3 class="skills__subheading" data-reveal>{t.stack.principles}</h3>
 		<div class="skills__concepts">
-			<p class="skills__concepts-title label" data-reveal="fade">{t.stack.principles}</p>
-			<div class="skills__concept-groups">
-				{
-					conceptGroups.map((group) => (
-						<div class="skills__concept-group">
-							<h3 class="skills__concept-heading" data-reveal>
-								{group.title}
-							</h3>
-							<ul class="skills__concept-list" data-reveal-group>
-								{group.items.map((item) => (
-									<li data-reveal>
-										<span class="skills__concept-arrow" aria-hidden="true">
-											→
-										</span>
-										<span class="skills__concept-text">{item.name}</span>
-									</li>
-								))}
-							</ul>
-						</div>
-					))
-				}
-			</div>
+			{
+				conceptGroups.map((group) => (
+					<div class="skills__concept-group" data-reveal>
+						<h4 class="skills__group-title">{group.title}</h4>
+						<ul class="skills__concept-list">
+							{group.items.map((item) => (
+								<li>{item}</li>
+							))}
+						</ul>
+					</div>
+				))
+			}
 		</div>
 	</div>
 </section>
 
 <style>
-	.skills__groups {
-		display: grid;
-		gap: 2.5rem;
-	}
-
-	.skills__group {
+	.skills__bento {
 		display: grid;
 		gap: 1rem;
 	}
 
-	.skills__group-title {
+	.skills__group {
 		display: flex;
-		justify-content: space-between;
-		padding-bottom: 0.75rem;
-		border-bottom: 1px solid var(--line);
+		flex-direction: column;
+		gap: 1.5rem;
 	}
 
-	.skills__count {
-		color: var(--text-dim);
+	.skills__group-title {
+		font-size: var(--fs-small);
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		color: var(--text-secondary);
 	}
 
-	.skills__tiles {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
-		gap: 0.75rem;
+	.skills__tech {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.1em 0.5em;
+		margin-top: auto;
+		font-size: var(--fs-title);
+		font-weight: 600;
+		line-height: 1.15;
+		letter-spacing: -0.03em;
+	}
+
+	.skills__tech li {
+		transition: color var(--dur-micro) var(--ease-out);
+	}
+
+	/* Hovering one technology dims the rest of its group */
+	@media (hover: hover) {
+		.skills__tech:hover li:not(:hover) {
+			color: var(--text-secondary);
+		}
+	}
+
+	.skills__subheading {
+		margin-top: clamp(4rem, 3rem + 4vw, 7rem);
+		margin-bottom: 1.5rem;
+		font-size: var(--fs-title);
+		letter-spacing: -0.025em;
 	}
 
 	.skills__concepts {
-		margin-top: clamp(4rem, 3rem + 5vw, 8rem);
-	}
-
-	.skills__concepts-title {
-		margin-bottom: 2rem;
-	}
-
-	.skills__concept-groups {
 		display: grid;
-		gap: 3rem;
+		gap: 2.5rem;
 	}
 
-	.skills__concept-heading {
-		font-size: var(--step-h3);
-		margin-bottom: 1rem;
-		color: var(--text-muted);
+	.skills__concept-list {
+		margin-top: 0.75rem;
 	}
 
 	.skills__concept-list li {
-		position: relative;
-		padding-block: 0.9rem;
+		padding-block: 0.85rem;
 		border-bottom: 1px solid var(--line);
-		font-size: var(--step-lead);
-		letter-spacing: -0.015em;
-	}
-
-	.skills__concept-arrow {
-		position: absolute;
-		left: 0;
-		color: var(--accent);
-		opacity: 0;
-		transform: translateX(-0.5rem);
-	}
-
-	.skills__concept-text {
-		display: inline-block;
-	}
-
-	.skills__concept-arrow,
-	.skills__concept-text {
-		transition:
-			opacity var(--dur-component) var(--ease-out),
-			transform var(--dur-component) var(--ease-out);
-	}
-
-	@media (hover: hover) {
-		.skills__concept-list li:hover .skills__concept-arrow {
-			opacity: 1;
-			transform: none;
-		}
-
-		.skills__concept-list li:hover .skills__concept-text {
-			transform: translateX(1.5rem);
-		}
+		font-size: var(--fs-lead);
 	}
 
 	@media (min-width: 48rem) {
-		.skills__groups {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 3rem 2rem;
+		.skills__group {
+			min-height: 14rem;
 		}
 
-		.skills__concept-groups {
+		.skills__bento,
+		.skills__concepts {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 2rem;
+		}
+
+		.skills__concepts {
+			column-gap: 3rem;
+		}
+	}
+
+	@media (min-width: 64rem) {
+		/* Bento: the larger groups take more width */
+		.skills__bento {
+			grid-template-columns: repeat(6, minmax(0, 1fr));
+		}
+
+		.skills__group:nth-child(4n + 1),
+		.skills__group:nth-child(4n) {
+			grid-column: span 2;
+		}
+
+		.skills__group:nth-child(4n + 2),
+		.skills__group:nth-child(4n + 3) {
+			grid-column: span 4;
 		}
 	}
 </style>

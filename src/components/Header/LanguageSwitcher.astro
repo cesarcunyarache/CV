@@ -31,23 +31,24 @@ const { current, label } = Astro.props;
 	.lang {
 		display: flex;
 		align-items: center;
-		font-family: var(--font-mono);
-		font-size: var(--step-label);
-		letter-spacing: 0.1em;
+		padding: 0.2rem;
+		border-radius: 999px;
+		background: var(--line-soft);
+		font-size: var(--fs-caption);
+		font-weight: 600;
+		letter-spacing: 0.01em;
 	}
 
 	.lang__link {
 		display: grid;
 		place-items: center;
-		min-width: 2.5rem;
-		min-height: 2.5rem;
-		color: var(--text-dim);
-		transition: color var(--dur-micro) var(--ease-out);
-	}
-
-	.lang__link + .lang__link {
-		border-left: 1px solid var(--line-strong);
-		min-width: 2.75rem;
+		min-width: 2.25rem;
+		min-height: 1.85rem;
+		border-radius: 999px;
+		color: var(--text-secondary);
+		transition:
+			color var(--dur-micro) var(--ease-out),
+			background-color var(--dur-micro) var(--ease-out);
 	}
 
 	.lang__link:hover {
@@ -55,6 +56,8 @@ const { current, label } = Astro.props;
 	}
 
 	.lang__link[aria-current='page'] {
-		color: var(--accent);
+		color: var(--text);
+		background: var(--bg);
+		box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
 	}
 </style>

@@ -5,119 +5,87 @@ import type { ResolvedPortfolio } from '../../data';
 interface Props {
 	title: string;
 	items: ResolvedPortfolio['certifications'];
+	newTabLabel: string;
 }
 
-const { title, items } = Astro.props;
+const { title, items, newTabLabel } = Astro.props;
 ---
 
 <div class="certs">
-	<h3 class="certs__title label" data-reveal="fade">{title}</h3>
-	<ol class="certs__list" data-reveal-group>
+	<h3 class="certs__title" data-reveal>{title}</h3>
+	<ul class="certs__list" data-reveal-group>
 		{
-			items.map((item, i) => {
-				const Tag = item.url ? 'a' : 'div';
+			items.map((item) => {
+				const details = [item.issuer, item.year].filter(Boolean).join(' · ');
+				const body = (
+					<>
+						<span class="cert__name">{item.name}</span>
+						{details && <span class="cert__details">{details}</span>}
+					</>
+				);
 				return (
-					<li data-reveal>
-						<Tag
-							class="cert"
-							href={item.url}
-							target={item.url ? '_blank' : undefined}
-							rel={item.url ? 'noopener noreferrer' : undefined}
-						>
-							<span class="cert__index label">{String(i + 1).padStart(2, '0')}</span>
-							<span class="cert__main">
-								<span class="cert__name">{item.name}</span>
-								{(item.issuer || item.year) && (
-									<span class="cert__issuer">{[item.issuer, item.year].filter(Boolean).join(' · ')}</span>
-								)}
-							</span>
-							<span class="cert__tag label">{item.tag}</span>
-							{item.url && <Icon name="arrow-up-right" size={16} class="cert__arrow" />}
-						</Tag>
+					<li class="cert" data-reveal>
+						{item.url ? (
+							<a class="cert__link" href={item.url} target="_blank" rel="noopener noreferrer">
+								{body}
+								<span class="sr-only">{newTabLabel}</span>
+								<Icon name="arrow-up-right" size={16} class="cert__arrow" />
+							</a>
+						) : (
+							body
+						)}
 					</li>
 				);
 			})
 		}
-	</ol>
+	</ul>
 </div>
 
 <style>
 	.certs__title {
-		padding-bottom: 1rem;
-		border-bottom: 1px solid var(--line-strong);
+		margin-bottom: 0.75rem;
+		font-size: var(--fs-small);
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		color: var(--text-secondary);
+	}
+
+	.cert,
+	.cert__link {
+		display: grid;
+		gap: 0.2rem;
 	}
 
 	.cert {
-		position: relative;
-		display: grid;
-		grid-template-columns: 2.5rem 1fr;
-		gap: 0.25rem 1rem;
-		align-items: baseline;
-		padding: 1.25rem 0.5rem;
+		padding-block: 1.1rem;
 		border-bottom: 1px solid var(--line);
-		isolation: isolate;
 	}
 
-	/* Row highlight that wipes in from the left */
-	.cert::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		z-index: -1;
-		background: var(--surface);
-		transform: scaleX(0);
-		transform-origin: left;
-		transition: transform var(--dur-component) var(--ease-out);
+	.cert:first-child {
+		border-top: 1px solid var(--line);
 	}
 
-	.cert:hover::before {
-		transform: none;
-	}
-
-	.cert__main {
-		display: grid;
-		gap: 0.25rem;
-		transition: transform var(--dur-component) var(--ease-out);
-	}
-
-	.cert:hover .cert__main {
-		transform: translateX(0.5rem);
+	.cert__link {
+		position: relative;
+		padding-right: 2rem;
 	}
 
 	.cert__name {
-		font-size: var(--step-lead);
-		letter-spacing: -0.015em;
+		font-size: var(--fs-lead);
+		font-weight: 600;
+		letter-spacing: -0.02em;
 		line-height: 1.3;
 	}
 
-	.cert__issuer {
-		font-size: var(--step-meta);
-		color: var(--text-muted);
+	.cert__details {
+		font-size: var(--fs-small);
+		color: var(--text-secondary);
 	}
 
-	.cert__tag {
-		grid-column: 2;
-		color: var(--text-dim);
-	}
-
-	.cert :global(.cert__arrow) {
+	.cert__link :global(.cert__arrow) {
 		position: absolute;
-		top: 1.5rem;
-		right: 0.5rem;
-		color: var(--text-muted);
-	}
-
-	.cert:hover .cert__index {
+		top: 0.35rem;
+		right: 0;
 		color: var(--accent);
-	}
-
-	@media (min-width: 48rem) {
-		.cert {
-			grid-template-columns: 3rem 1fr auto;
-		}
-
-		.cert__tag {
-			grid-column: auto;
-		}
 	}
 </style>

@@ -1,70 +1,38 @@
 ---
+/**
+ * Two-tone headline: the title, followed by a muted continuation.
+ * `Cómo trabajo. Del proceso de negocio a producción.`
+ */
 interface Props {
-	index: number;
-	label: string;
-	title?: string;
-	intro?: string;
+	title: string;
+	subtitle?: string;
 	id?: string;
+	align?: 'start' | 'center';
 }
 
-const { index, label, title, intro, id } = Astro.props;
-const number = String(index).padStart(2, '0');
+const { title, subtitle, id, align = 'start' } = Astro.props;
 ---
 
-<header class="section-heading">
-	<p class="section-heading__meta label" data-reveal="fade">
-		<span class="section-heading__index">{number}</span>
-		<span class="section-heading__rule" aria-hidden="true"></span>
-		<span>{label}</span>
-	</p>
-	{
-		title && (
-			<h2 class="section-heading__title" id={id} data-reveal="mask">
-				<span class="mask">{title}</span>
-			</h2>
-		)
-	}
-	{
-		intro && (
-			<p class="section-heading__intro" data-reveal>
-				{intro}
-			</p>
-		)
-	}
-</header>
+<h2 class:list={['heading', `heading--${align}`]} id={id} data-reveal>
+	{title}{subtitle && ' '}
+	{subtitle && <span class="heading__subtitle">{subtitle}</span>}
+</h2>
 
 <style>
-	.section-heading {
-		display: grid;
-		gap: 1.5rem;
-		margin-bottom: clamp(3rem, 2rem + 4vw, 6rem);
+	.heading {
+		max-width: 20ch;
+		margin-bottom: clamp(3rem, 2rem + 3vw, 5rem);
+		font-size: var(--fs-headline);
+		line-height: 1.05;
+		letter-spacing: -0.028em;
 	}
 
-	.section-heading__meta {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
+	.heading--center {
+		margin-inline: auto;
+		text-align: center;
 	}
 
-	.section-heading__index {
-		color: var(--accent);
-	}
-
-	.section-heading__rule {
-		width: 3rem;
-		height: 1px;
-		background: var(--line-strong);
-	}
-
-	.section-heading__title {
-		font-size: var(--step-h1);
-		max-width: 16ch;
-	}
-
-	.section-heading__intro {
-		max-width: 42ch;
-		font-size: var(--step-lead);
-		color: var(--text-muted);
-		line-height: 1.5;
+	.heading__subtitle {
+		color: var(--text-secondary);
 	}
 </style>

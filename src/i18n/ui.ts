@@ -1,11 +1,17 @@
 /**
- * Interface strings (navigation, labels, buttons, SEO). Portfolio content
+ * Interface strings (navigation, headings, buttons, SEO). Portfolio content
  * lives in `src/data/portfolio.ts`.
  */
 import type { Localized } from './config';
 
 export const sections = ['about', 'work', 'approach', 'experience', 'stack', 'education', 'contact'] as const;
 export type SectionId = (typeof sections)[number];
+
+/** Two-tone section headline: `title` + a muted continuation. */
+interface Heading {
+	title: Localized;
+	subtitle: Localized;
+}
 
 export const ui = {
 	meta: {
@@ -22,13 +28,14 @@ export const ui = {
 		skipToContent: { es: 'Saltar al contenido', en: 'Skip to content' },
 		mainNav: { es: 'Navegación principal', en: 'Main navigation' },
 		languageSwitcher: { es: 'Cambiar idioma', en: 'Change language' },
+		themeToggle: { es: 'Cambiar entre tema claro y oscuro', en: 'Switch between light and dark theme' },
 		openMenu: { es: 'Abrir menú', en: 'Open menu' },
 		closeMenu: { es: 'Cerrar menú', en: 'Close menu' },
 		backToTop: { es: 'Volver arriba', en: 'Back to top' },
 		opensInNewTab: { es: '(abre en una pestaña nueva)', en: '(opens in a new tab)' },
 		architectureDiagram: {
-			es: 'Diagrama decorativo de capas de un sistema: interfaz, API, reglas de negocio y base de datos.',
-			en: 'Decorative diagram of system layers: interface, API, business rules and database.',
+			es: 'Diagrama de las capas de un sistema: interfaz, API, reglas de negocio y base de datos.',
+			en: 'Diagram of system layers: interface, API, business rules and database.',
 		},
 	},
 	nav: {
@@ -41,51 +48,58 @@ export const ui = {
 		contact: { es: 'Contacto', en: 'Contact' },
 	} satisfies Record<SectionId, Localized>,
 	/** Items shown in the navigation bar, in order. */
-	navItems: ['work', 'experience', 'about', 'contact'] satisfies SectionId[],
+	navItems: ['about', 'work', 'experience', 'stack', 'contact'] satisfies SectionId[],
+	headings: {
+		work: {
+			title: { es: 'Trabajo seleccionado.', en: 'Selected work.' },
+			subtitle: {
+				es: 'Software que resuelve problemas concretos del negocio.',
+				en: 'Software that solves concrete business problems.',
+			},
+		},
+		approach: {
+			title: { es: 'Cómo trabajo.', en: 'How I work.' },
+			subtitle: {
+				es: 'Del proceso de negocio a producción, en cuatro pasos.',
+				en: 'From business process to production, in four steps.',
+			},
+		},
+		experience: {
+			title: { es: 'Experiencia.', en: 'Experience.' },
+			subtitle: { es: 'Software empresarial en producción.', en: 'Enterprise software in production.' },
+		},
+		stack: {
+			title: { es: 'Stack técnico.', en: 'Tech stack.' },
+			subtitle: {
+				es: 'Las herramientas de cada día y los principios detrás de ellas.',
+				en: 'Everyday tools and the principles behind them.',
+			},
+		},
+		education: {
+			title: { es: 'Formación.', en: 'Education.' },
+			subtitle: { es: 'Ingeniería y aprendizaje continuo.', en: 'Engineering and continuous learning.' },
+		},
+	} satisfies Partial<Record<SectionId, Heading>>,
 	hero: {
 		ctaWork: { es: 'Ver proyectos', en: 'View work' },
 		ctaContact: { es: 'Hablemos', en: "Let's talk" },
-		scroll: { es: 'Desliza', en: 'Scroll' },
-		currently: { es: 'Actualmente', en: 'Currently' },
 		layers: {
 			es: ['Interfaz', 'API REST', 'Reglas de negocio', 'Base de datos'],
 			en: ['Interface', 'REST API', 'Business rules', 'Database'],
 		},
 	},
-	sectionTitles: {
-		about: { es: 'Quién soy', en: 'Who I am' },
-		work: { es: 'Trabajo seleccionado', en: 'Selected work' },
-		approach: { es: 'Cómo trabajo', en: 'How I work' },
-		experience: { es: 'Experiencia', en: 'Experience' },
-		stack: { es: 'Stack técnico', en: 'Tech stack' },
-		education: { es: 'Formación', en: 'Education' },
-		contact: { es: 'Contacto', en: 'Contact' },
-	} satisfies Record<SectionId, Localized>,
 	about: {
+		eyebrow: { es: 'Quién soy', en: 'Who I am' },
 		languages: { es: 'Idiomas', en: 'Languages' },
 	},
 	work: {
-		intro: {
-			es: 'Casos donde el software resuelve un problema concreto del negocio.',
-			en: 'Cases where software solves a concrete business problem.',
-		},
 		empty: {
 			es: 'Estoy documentando mis proyectos. Muy pronto estarán aquí.',
 			en: 'I am documenting my projects. They will be here soon.',
 		},
-		placeholder: { es: 'Placeholder', en: 'Placeholder' },
-		featured: { es: 'Destacado', en: 'Featured' },
-		role: { es: 'Rol', en: 'Role' },
-		live: { es: 'Ver en vivo', en: 'Live site' },
-		repository: { es: 'Código', en: 'Source' },
-		cursorLabel: { es: 'Ver', en: 'View' },
-		dragHint: { es: 'Sigue deslizando', en: 'Keep scrolling' },
-	},
-	approach: {
-		intro: {
-			es: 'Entiendo el negocio y la ingeniería. Este es el recorrido de una regla de negocio hasta producción.',
-			en: 'I understand both the business and the engineering. This is the path from a business rule to production.',
-		},
+		placeholder: { es: 'Ejemplo', en: 'Sample' },
+		live: { es: 'Ver sitio', en: 'Live site' },
+		repository: { es: 'Ver código', en: 'View code' },
 	},
 	experience: {
 		present: { es: 'Presente', en: 'Present' },
@@ -95,25 +109,21 @@ export const ui = {
 		reduction: { es: 'menos', en: 'less' },
 	},
 	stack: {
-		intro: {
-			es: 'Herramientas que uso a diario y los conceptos que guían cómo las uso.',
-			en: 'Tools I use every day and the concepts that guide how I use them.',
-		},
 		principles: { es: 'Principios y dominio', en: 'Principles & domain' },
 	},
 	education: {
 		certifications: { es: 'Cursos y certificaciones', en: 'Courses & certifications' },
 	},
 	contact: {
+		eyebrow: { es: 'Contacto', en: 'Contact' },
 		emailLabel: { es: 'Correo', en: 'Email' },
 		email: { es: 'Escríbeme', en: 'Email me' },
 		copy: { es: 'Copiar correo', en: 'Copy email' },
 		copied: { es: 'Copiado', en: 'Copied' },
-		localTime: { es: 'Hora local', en: 'Local time' },
+		localTime: { es: 'Hora local en', en: 'Local time in' },
 	},
 	footer: {
 		builtWith: { es: 'Diseñado y construido con Astro.', en: 'Designed and built with Astro.' },
-		rights: { es: 'Todos los derechos reservados.', en: 'All rights reserved.' },
 	},
 	notFound: {
 		title: { es: 'Página no encontrada', en: 'Page not found' },

@@ -8,34 +8,17 @@ const site = 'https://example.com';
 export default defineConfig({
 	site,
 	trailingSlash: 'ignore',
-	build: { inlineStylesheets: 'auto' },
+	build: { inlineStylesheets: 'always' },
 	fonts: [
 		{
+			// Fallback for non-Apple platforms; Apple devices use SF Pro (system).
 			provider: fontProviders.google(),
-			name: 'Geist',
-			cssVariable: '--font-sans',
-			weights: ['300 700'],
+			name: 'Inter',
+			cssVariable: '--font-inter',
+			weights: ['400 700'],
 			styles: ['normal'],
 			subsets: ['latin'],
-			fallbacks: ['system-ui', 'sans-serif'],
-		},
-		{
-			provider: fontProviders.google(),
-			name: 'Geist Mono',
-			cssVariable: '--font-mono',
-			weights: [400, 500],
-			styles: ['normal'],
-			subsets: ['latin'],
-			fallbacks: ['ui-monospace', 'monospace'],
-		},
-		{
-			provider: fontProviders.google(),
-			name: 'Instrument Serif',
-			cssVariable: '--font-serif',
-			weights: [400],
-			styles: ['italic'],
-			subsets: ['latin'],
-			fallbacks: ['Georgia', 'serif'],
+			fallbacks: ['Arial', 'sans-serif'],
 		},
 	],
 });

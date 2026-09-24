@@ -21,7 +21,6 @@ export const portfolio: Portfolio = {
 			country: { es: 'Perú', en: 'Peru' },
 			countryCode: 'PE',
 			timeZone: 'America/Lima',
-			coordinates: '5.19°S 80.63°W',
 		},
 		headline: {
 			es: 'Construyo software empresarial que entiende el negocio.',
@@ -31,7 +30,6 @@ export const portfolio: Portfolio = {
 			es: 'Desarrollador backend enfocado en APIs, arquitectura y reglas de negocio. Transformo procesos reales en sistemas mantenibles, medibles y rápidos.',
 			en: 'Backend developer focused on APIs, architecture and business rules. I turn real processes into maintainable, measurable and fast systems.',
 		},
-		focusTags: ['BACKEND', 'APIs REST', 'ERP', 'ARCHITECTURE', 'BUSINESS RULES', 'DATABASE'],
 		availability: {
 			es: 'Desarrollador de Software en Allen Dostmen S.A.C.',
 			en: 'Software Developer at Allen Dostmen S.A.C.',
@@ -69,7 +67,6 @@ export const portfolio: Portfolio = {
 
 	principles: [
 		{
-			tag: 'PROCESS',
 			title: { es: 'Entender el negocio', en: 'Understand the business' },
 			description: {
 				es: 'Analizo cómo funciona el proceso real antes de proponer una solución técnica.',
@@ -77,7 +74,6 @@ export const portfolio: Portfolio = {
 			},
 		},
 		{
-			tag: 'BUSINESS RULES',
 			title: { es: 'Modelar las reglas', en: 'Model the rules' },
 			description: {
 				es: 'Convierto reglas de negocio en modelos y flujos explícitos, no en condiciones dispersas.',
@@ -85,7 +81,6 @@ export const portfolio: Portfolio = {
 			},
 		},
 		{
-			tag: 'ARCHITECTURE',
 			title: { es: 'Diseñar para cambiar', en: 'Design for change' },
 			description: {
 				es: 'Arquitectura modular, SOLID y Clean Code para que el sistema evolucione sin romperse.',
@@ -93,7 +88,6 @@ export const portfolio: Portfolio = {
 			},
 		},
 		{
-			tag: 'PERFORMANCE',
 			title: { es: 'Medir y optimizar', en: 'Measure and optimise' },
 			description: {
 				es: 'Optimizo consultas y tiempos de respuesta con datos, no con suposiciones.',
@@ -197,54 +191,37 @@ export const portfolio: Portfolio = {
 			id: 'frameworks',
 			kind: 'technologies',
 			title: { es: 'Frameworks', en: 'Frameworks' },
-			items: [
-				{ name: 'Laravel', symbol: 'Lv' },
-				{ name: 'NestJS', symbol: 'Ns' },
-			],
+			items: ['Laravel', 'NestJS'],
 		},
 		{
 			id: 'languages',
 			kind: 'technologies',
 			title: { es: 'Lenguajes', en: 'Languages' },
-			items: [
-				{ name: 'PHP', symbol: 'Ph' },
-				{ name: 'TypeScript', symbol: 'Ts' },
-				{ name: 'JavaScript', symbol: 'Js' },
-				{ name: 'Java', symbol: 'Jv' },
-			],
+			items: ['PHP', 'TypeScript', 'JavaScript', 'Java'],
 		},
 		{
 			id: 'databases',
 			kind: 'technologies',
 			title: { es: 'Bases de datos', en: 'Databases' },
-			items: [
-				{ name: 'PostgreSQL', symbol: 'Pg' },
-				{ name: 'MySQL', symbol: 'My' },
-				{ name: 'Eloquent', symbol: 'El' },
-				{ name: 'Prisma', symbol: 'Pr' },
-			],
+			items: ['PostgreSQL', 'MySQL', 'Eloquent', 'Prisma'],
 		},
 		{
 			id: 'tools',
 			kind: 'technologies',
 			title: { es: 'Herramientas', en: 'Tools' },
-			items: [
-				{ name: 'Git', symbol: 'Gt' },
-				{ name: 'Docker', symbol: 'Dk' },
-				{ name: 'Linux', symbol: 'Lx' },
-			],
+			items: ['Git', 'Docker', 'Linux'],
 		},
 		{
 			id: 'development',
 			kind: 'concepts',
 			title: { es: 'Desarrollo', en: 'Development' },
 			items: [
-				{ name: { es: 'Desarrollo de software', en: 'Software development' } },
-				{ name: { es: 'Desarrollo backend', en: 'Backend development' } },
-				{ name: 'APIs REST' },
-				{ name: 'Clean Code' },
-				{ name: 'SOLID' },
-				{ name: { es: 'Arquitectura modular', en: 'Modular architecture' } },
+				{ es: 'Desarrollo de software', en: 'Software development' },
+				{ es: 'Desarrollo backend', en: 'Backend development' },
+				'APIs REST',
+				'Clean Code',
+				'SOLID',
+				{ es: 'Arquitectura modular', en: 'Modular architecture' },
 			],
 		},
 		{
@@ -252,11 +229,11 @@ export const portfolio: Portfolio = {
 			kind: 'concepts',
 			title: { es: 'Sistemas', en: 'Systems' },
 			items: [
-				{ name: { es: 'Software empresarial', en: 'Enterprise software' } },
-				{ name: { es: 'Análisis de procesos', en: 'Process analysis' } },
-				{ name: { es: 'Modelamiento de reglas de negocio', en: 'Business rules modelling' } },
-				{ name: { es: 'Sistemas ERP', en: 'ERP systems' } },
-				{ name: { es: 'Diseño y optimización de consultas', en: 'Query design and optimisation' } },
+				{ es: 'Software empresarial', en: 'Enterprise software' },
+				{ es: 'Análisis de procesos', en: 'Process analysis' },
+				{ es: 'Modelamiento de reglas de negocio', en: 'Business rules modelling' },
+				{ es: 'Sistemas ERP', en: 'ERP systems' },
+				{ es: 'Diseño y optimización de consultas', en: 'Query design and optimisation' },
 			],
 		},
 	],
@@ -272,10 +249,10 @@ export const portfolio: Portfolio = {
 	],
 
 	certifications: [
-		{ name: 'CCNAv7: Switching, Routing and Wireless Essentials', issuer: 'Cisco Networking Academy', tag: 'NETWORKING' },
-		{ name: 'CCNAv7: Introduction to Networks', issuer: 'Cisco Networking Academy', tag: 'NETWORKING' },
-		{ name: 'PCAP: Programming Essentials in Python', tag: 'PYTHON' },
-		{ name: 'Inspiring Study Conference with Google', tag: 'CONFERENCE' },
+		{ name: 'CCNAv7: Switching, Routing and Wireless Essentials', issuer: 'Cisco Networking Academy' },
+		{ name: 'CCNAv7: Introduction to Networks', issuer: 'Cisco Networking Academy' },
+		{ name: 'PCAP: Programming Essentials in Python' },
+		{ name: 'Inspiring Study Conference with Google' },
 	],
 
 	languages: [

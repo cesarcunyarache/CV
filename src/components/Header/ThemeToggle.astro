@@ -1,0 +1,56 @@
+---
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+	label: string;
+}
+
+const { label } = Astro.props;
+---
+
+<button class="theme-toggle" type="button" aria-label={label} title={label} data-theme-toggle>
+	<Icon name="moon" size={17} class="theme-toggle__moon" />
+	<Icon name="sun" size={17} class="theme-toggle__sun" />
+</button>
+
+<style>
+	.theme-toggle {
+		display: grid;
+		place-items: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 50%;
+		color: var(--text-secondary);
+		transition:
+			color var(--dur-micro) var(--ease-out),
+			background-color var(--dur-micro) var(--ease-out);
+	}
+
+	.theme-toggle:hover {
+		color: var(--text);
+		background: var(--line-soft);
+	}
+
+	/* Show the icon of the theme you would switch to */
+	.theme-toggle :global(.theme-toggle__sun) {
+		display: none;
+	}
+
+	:global(:root[data-theme='dark']) .theme-toggle :global(.theme-toggle__sun) {
+		display: block;
+	}
+
+	:global(:root[data-theme='dark']) .theme-toggle :global(.theme-toggle__moon) {
+		display: none;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .theme-toggle :global(.theme-toggle__sun) {
+			display: block;
+		}
+
+		:global(:root:not([data-theme='light'])) .theme-toggle :global(.theme-toggle__moon) {
+			display: none;
+		}
+	}
+</style>

@@ -7,10 +7,9 @@ import type { Locale } from '../../i18n/config';
 interface Props {
 	content: Content;
 	locale: Locale;
-	index: number;
 }
 
-const { content, locale, index } = Astro.props;
+const { content, locale } = Astro.props;
 const { data, t } = content;
 
 /** Every year between start and end, for the timeline ticks. */
@@ -21,20 +20,19 @@ const yearsOf = (start: string, end?: string) => {
 };
 ---
 
-<section class="education section" id="education" aria-labelledby="education-title">
+<section class="education section section--alt" id="education" aria-labelledby="education-title">
 	<div class="container">
-		<SectionHeading index={index} label={t.nav.education} title={t.sectionTitles.education} id="education-title" />
+		<SectionHeading title={t.headings.education.title} subtitle={t.headings.education.subtitle} id="education-title" />
 
 		<div class="education__grid">
 			<div class="education__degrees">
 				{
 					data.education.map((item) => (
-						<article class="degree" data-reveal>
-							<p class="label">{formatRange(item.start, item.end, locale, t.experience.present)}</p>
+						<article class="degree tile" data-reveal>
+							<p class="degree__range">{formatRange(item.start, item.end, locale, t.experience.present)}</p>
 							<h3 class="degree__title">{item.degree}</h3>
 							<p class="degree__institution">
-								{item.institution}
-								<span> · {item.location}</span>
+								{item.institution} <span class="muted">· {item.location}</span>
 							</p>
 							<ol class="degree__timeline" aria-hidden="true">
 								{yearsOf(item.start, item.end).map((year, i) => (
@@ -46,7 +44,7 @@ const yearsOf = (start: string, end?: string) => {
 				}
 			</div>
 
-			<Certifications title={t.education.certifications} items={data.certifications} />
+			<Certifications title={t.education.certifications} items={data.certifications} newTabLabel={t.a11y.opensInNewTab} />
 		</div>
 	</div>
 </section>
@@ -54,30 +52,27 @@ const yearsOf = (start: string, end?: string) => {
 <style>
 	.education__grid {
 		display: grid;
-		gap: 4rem;
+		gap: 3.5rem;
 	}
 
 	.degree {
 		display: grid;
-		gap: 0.75rem;
-		padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
-		border: 1px solid var(--line);
-		border-radius: var(--radius-lg);
-		background:
-			radial-gradient(circle at 100% 0%, rgb(255 106 61 / 0.1), transparent 50%),
-			var(--surface);
+		gap: 0.5rem;
+	}
+
+	.degree__range {
+		font-size: var(--fs-small);
+		font-weight: 600;
+		color: var(--text-secondary);
 	}
 
 	.degree__title {
-		font-size: var(--step-h2);
+		font-size: var(--fs-title);
+		letter-spacing: -0.028em;
 	}
 
 	.degree__institution {
-		font-size: var(--step-lead);
-	}
-
-	.degree__institution span {
-		color: var(--text-muted);
+		font-size: var(--fs-lead);
 	}
 
 	/* Year ticks along a line that draws itself when revealed */
@@ -85,19 +80,20 @@ const yearsOf = (start: string, end?: string) => {
 		position: relative;
 		display: flex;
 		justify-content: space-between;
-		margin-top: 2rem;
+		margin-top: 2.5rem;
 		padding-top: 1rem;
-		font-family: var(--font-mono);
-		font-size: var(--step-label);
-		color: var(--text-muted);
+		font-size: var(--fs-caption);
+		color: var(--text-secondary);
+		font-variant-numeric: tabular-nums;
 	}
 
 	.degree__timeline::before {
 		content: '';
 		position: absolute;
 		inset: 0 0 auto;
-		height: 1px;
-		background: linear-gradient(90deg, var(--line-strong), var(--accent));
+		height: 2px;
+		border-radius: 1px;
+		background: linear-gradient(90deg, var(--line), var(--accent-fill));
 		transform-origin: left;
 		transition: transform 1.6s var(--ease-out) 300ms;
 	}
@@ -105,7 +101,7 @@ const yearsOf = (start: string, end?: string) => {
 	.degree__timeline li {
 		position: relative;
 		transition: opacity var(--dur-component) var(--ease-out);
-		transition-delay: calc(400ms + var(--i) * 180ms);
+		transition-delay: calc(400ms + var(--i) * 160ms);
 	}
 
 	.degree__timeline li::before {
@@ -113,30 +109,30 @@ const yearsOf = (start: string, end?: string) => {
 		position: absolute;
 		top: calc(-1rem - 3px);
 		left: 50%;
-		width: 7px;
-		height: 7px;
+		width: 8px;
+		height: 8px;
 		border-radius: 50%;
-		background: var(--bg);
-		border: 1px solid var(--text-muted);
+		background: var(--surface);
+		box-shadow: inset 0 0 0 2px var(--line);
 		translate: -50% 0;
 	}
 
 	.degree__timeline li:last-child::before {
-		border-color: var(--accent);
-		background: var(--accent);
+		background: var(--accent-fill);
+		box-shadow: none;
 	}
 
-	:global(.js) .degree:not(.is-visible) .degree__timeline::before {
+	:global(.js) .degree:not(:global(.is-visible)) .degree__timeline::before {
 		transform: scaleX(0);
 	}
 
-	:global(.js) .degree:not(.is-visible) .degree__timeline li {
+	:global(.js) .degree:not(:global(.is-visible)) .degree__timeline li {
 		opacity: 0;
 	}
 
 	@media (min-width: 64rem) {
 		.education__grid {
-			grid-template-columns: 5fr 7fr;
+			grid-template-columns: 1fr 1fr;
 			gap: 4rem;
 			align-items: start;
 		}

@@ -16,10 +16,10 @@ const { t } = content;
 	indexable={false}
 >
 	<main id="main" class="not-found container">
-		<p class="label">Error 404</p>
+		<p class="not-found__code">404</p>
 		<h1 class="not-found__title">{t.notFound.title}</h1>
 		<p class="not-found__text">{t.notFound.description}</p>
-		<Button href={localePath(defaultLocale)} variant="primary" icon="arrow-right">{t.notFound.back}</Button>
+		<Button href={localePath(defaultLocale)}>{t.notFound.back}</Button>
 	</main>
 </BaseLayout>
 
@@ -32,12 +32,18 @@ const { t } = content;
 		gap: 1.5rem;
 	}
 
+	.not-found__code {
+		font-size: var(--fs-subtitle);
+		font-weight: 600;
+		color: var(--text-secondary);
+	}
+
 	.not-found__title {
-		font-size: var(--step-h1);
+		font-size: var(--fs-headline);
 	}
 
 	.not-found__text {
-		color: var(--text-muted);
-		font-size: var(--step-lead);
+		color: var(--text-secondary);
+		font-size: var(--fs-lead);
 	}
 </style>

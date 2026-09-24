@@ -16,40 +16,29 @@ const range = formatRange(item.start, item.end, locale, t.experience.present);
 <article class="job">
 	<div class="job__main">
 		<header class="job__header" data-reveal>
-			<p class="job__range label">
+			<p class="job__range">
 				{!item.end && <span class="job__live" aria-hidden="true" />}
 				{range}
 			</p>
 			<h3 class="job__company">{item.company}</h3>
 			<p class="job__role">
-				{item.role} <span class="job__location">· {item.location}</span>
+				{item.role} <span class="muted">· {item.location}</span>
 			</p>
 			{item.summary && <p class="job__summary">{item.summary}</p>}
 		</header>
 
-		<ol class="job__highlights" data-reveal-group>
-			{
-				item.highlights.map((highlight, i) => (
-					<li data-reveal>
-						<span class="job__marker label" aria-hidden="true">
-							{String(i + 1).padStart(2, '0')}
-						</span>
-						<p>{highlight}</p>
-					</li>
-				))
-			}
-		</ol>
+		<ul class="job__highlights" data-reveal-group>
+			{item.highlights.map((highlight) => <li data-reveal>{highlight}</li>)}
+		</ul>
 	</div>
 
 	{
 		item.caseStudy && (
 			<div class="job__case">
 				<div class="job__case-head" data-reveal>
-					<p class="label">
-						<span class="accent">●</span> {t.experience.caseStudy}
-					</p>
+					<p class="job__case-eyebrow">{t.experience.caseStudy}</p>
 					<p class="job__case-title">{item.caseStudy.title}</p>
-					<p class="job__case-context">{item.caseStudy.context}</p>
+					<p class="muted">{item.caseStudy.context}</p>
 				</div>
 				<div class="job__metrics" data-reveal-group>
 					{item.caseStudy.metrics.map((metric) => (
@@ -64,93 +53,81 @@ const range = formatRange(item.start, item.end, locale, t.experience.present);
 <style>
 	.job {
 		display: grid;
-		gap: clamp(2.5rem, 2rem + 3vw, 5rem);
-		padding-top: 2.5rem;
-		border-top: 1px solid var(--line-strong);
+		gap: clamp(3rem, 2rem + 3vw, 5rem);
+	}
+
+	.job__main {
+		display: grid;
+		gap: 2.5rem;
 	}
 
 	.job__header {
 		display: grid;
-		gap: 0.75rem;
+		gap: 0.5rem;
+		align-content: start;
 	}
 
 	.job__range {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.6rem;
+		gap: 0.5rem;
+		font-size: var(--fs-small);
+		font-weight: 600;
+		color: var(--text-secondary);
 	}
 
 	.job__live {
-		width: 0.45rem;
-		height: 0.45rem;
+		width: 0.5rem;
+		height: 0.5rem;
 		border-radius: 50%;
-		background: var(--accent);
-		box-shadow: 0 0 0 4px var(--accent-soft);
+		background: var(--success);
 	}
 
 	.job__company {
-		font-size: var(--step-h1);
-		letter-spacing: -0.05em;
+		font-size: var(--fs-title);
+		letter-spacing: -0.028em;
 	}
 
 	.job__role {
-		font-size: var(--step-h3);
-		letter-spacing: -0.02em;
-	}
-
-	.job__location {
-		color: var(--text-muted);
+		font-size: var(--fs-lead);
 	}
 
 	.job__summary {
-		color: var(--text-muted);
-		max-width: 50ch;
-	}
-
-	.job__highlights {
-		display: grid;
-		gap: 0;
+		color: var(--text-secondary);
 	}
 
 	.job__highlights li {
-		display: grid;
-		grid-template-columns: 3rem 1fr;
-		gap: 1rem;
 		padding-block: 1.25rem;
-		border-bottom: 1px solid var(--line);
-		font-size: var(--step-lead);
+		border-top: 1px solid var(--line);
+		font-size: var(--fs-lead);
 		line-height: 1.45;
-		transition: color var(--dur-micro) var(--ease-out);
 	}
 
-	.job__highlights li:hover .job__marker {
-		color: var(--accent);
-	}
-
-	.job__marker {
-		padding-top: 0.45rem;
-		transition: color var(--dur-micro) var(--ease-out);
+	.job__highlights li:last-child {
+		border-bottom: 1px solid var(--line);
 	}
 
 	.job__case {
 		display: grid;
-		gap: 2rem;
+		gap: 1.5rem;
 	}
 
 	.job__case-head {
 		display: grid;
-		gap: 0.5rem;
+		gap: 0.35rem;
+	}
+
+	.job__case-eyebrow {
+		font-size: var(--fs-small);
+		font-weight: 600;
+		color: var(--accent);
 	}
 
 	.job__case-title {
-		font-size: var(--step-h2);
-		font-weight: 500;
-		letter-spacing: -0.035em;
+		font-size: var(--fs-title);
+		font-weight: 600;
+		letter-spacing: -0.025em;
 		line-height: 1.1;
-	}
-
-	.job__case-context {
-		color: var(--text-muted);
 	}
 
 	.job__metrics {
@@ -166,21 +143,13 @@ const range = formatRange(item.start, item.end, locale, t.experience.present);
 
 	@media (min-width: 64rem) {
 		.job__main {
-			display: grid;
 			grid-template-columns: 5fr 7fr;
 			column-gap: 4rem;
 		}
 
 		.job__header {
 			position: sticky;
-			top: calc(var(--header-height) + 3rem);
-			align-self: start;
-		}
-
-		.job__case {
-			grid-template-columns: 5fr 7fr;
-			column-gap: 4rem;
-			align-items: end;
+			top: calc(var(--header-height) + 2rem);
 		}
 	}
 </style>

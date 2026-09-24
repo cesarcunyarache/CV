@@ -14,6 +14,8 @@ interface Props {
 }
 
 const { locale, content, title, description, indexable } = Astro.props;
+// The Inter font is intentionally not preloaded: it is only downloaded where
+// the Apple system font (SF Pro) is not available.
 ---
 
 <!doctype html>
@@ -23,11 +25,19 @@ const { locale, content, title, description, indexable } = Astro.props;
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
 		<script is:inline>
-			document.documentElement.classList.add('js');
+			// Apply the saved theme before first paint and flag JS for progressive enhancement.
+			(() => {
+				const root = document.documentElement;
+				root.classList.add('js');
+				try {
+					const theme = localStorage.getItem('theme');
+					if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+				} catch {
+					// Storage unavailable: follow the OS theme.
+				}
+			})();
 		</script>
-		<Font cssVariable="--font-sans" preload />
-		<Font cssVariable="--font-mono" />
-		<Font cssVariable="--font-serif" />
+		<Font cssVariable="--font-inter" />
 		<SEO locale={locale} title={title} description={description} data={content.data} indexable={indexable} />
 	</head>
 	<body>
@@ -42,13 +52,13 @@ const { locale, content, title, description, indexable } = Astro.props;
 <style>
 	.skip-link {
 		position: fixed;
-		top: 1rem;
-		left: 1rem;
+		top: 0.75rem;
+		left: 0.75rem;
 		z-index: 200;
 		padding: 0.75rem 1rem;
-		border-radius: var(--radius-sm);
-		background: var(--accent);
-		color: var(--accent-contrast);
+		border-radius: 999px;
+		background: var(--accent-fill);
+		color: var(--on-accent);
 		font-weight: 500;
 		transform: translateY(-200%);
 		transition: transform var(--dur-micro) var(--ease-out);

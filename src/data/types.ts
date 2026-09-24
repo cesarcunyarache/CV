@@ -14,12 +14,10 @@ export interface Profile {
 	/** Short name used for the logo / navigation. */
 	shortName: string;
 	role: Localized;
-	location: { city: string; country: Localized; countryCode: string; timeZone: string; coordinates: string };
+	location: { city: string; country: Localized; countryCode: string; timeZone: string };
 	/** One line value proposition shown in the hero. */
 	headline: Localized;
 	summary: Localized;
-	/** Small technical tags floating around the hero. */
-	focusTags: string[];
 	/** Optional: shown in the hero when set. */
 	availability?: Localized;
 }
@@ -40,8 +38,6 @@ export interface AboutContent {
 export interface Principle {
 	title: Localized;
 	description: Localized;
-	/** Mono label, e.g. `BUSINESS RULES`. */
-	tag: string;
 }
 
 /** A before/after measurement rendered as an animated comparison. */
@@ -88,9 +84,9 @@ export interface Project {
 export interface SkillGroup {
 	id: string;
 	title: Localized;
-	/** Technologies render as tiles, concepts as a readable list. */
+	/** Technologies render as large type, concepts as a readable list. */
 	kind: 'technologies' | 'concepts';
-	items: { name: Localized | string; symbol?: string }[];
+	items: (Localized | string)[];
 }
 
 export interface Education {
@@ -106,7 +102,6 @@ export interface Certification {
 	issuer?: string;
 	year?: number;
 	url?: string;
-	tag: string;
 }
 
 export interface Language {

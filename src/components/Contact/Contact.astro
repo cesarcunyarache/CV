@@ -1,164 +1,114 @@
 ---
 import Button from '../ui/Button.astro';
 import Icon, { type IconName } from '../ui/Icon.astro';
-import SectionHeading from '../ui/SectionHeading.astro';
 import type { Content } from '../../data';
 
 interface Props {
 	content: Content;
-	index: number;
 }
 
-const { content, index } = Astro.props;
-const { data, t } = content;
+const { data, t } = Astro.props.content;
 const { contact, contactSection, profile } = data;
+const stripProtocol = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '');
 
 const channels: { label: string; value: string; href: string; icon: IconName; external: boolean }[] = [
 	{ label: t.contact.emailLabel, value: contact.email, href: `mailto:${contact.email}`, icon: 'mail', external: false },
-	{
-		label: 'LinkedIn',
-		value: contact.linkedin.replace(/^https?:\/\/(www\.)?/, ''),
-		href: contact.linkedin,
-		icon: 'linkedin',
-		external: true,
-	},
-	{
-		label: 'GitHub',
-		value: contact.github.replace(/^https?:\/\/(www\.)?/, ''),
-		href: contact.github,
-		icon: 'github',
-		external: true,
-	},
+	{ label: 'LinkedIn', value: stripProtocol(contact.linkedin), href: contact.linkedin, icon: 'linkedin', external: true },
+	{ label: 'GitHub', value: stripProtocol(contact.github), href: contact.github, icon: 'github', external: true },
 ];
 ---
 
 <section class="contact section" id="contact" aria-labelledby="contact-title">
-	<div class="contact__glow" aria-hidden="true"></div>
 	<div class="container">
-		<SectionHeading index={index} label={t.sectionTitles.contact} />
-
-		<h2 class="contact__title" id="contact-title" data-reveal="mask"><span class="mask">{contactSection.title}</span></h2>
-
-		<div class="contact__grid">
-			<div class="contact__cta" data-reveal>
-				<p class="contact__description">{contactSection.description}</p>
-				<div class="contact__actions">
-					<Button href={`mailto:${contact.email}`} variant="primary" icon="arrow-up-right" magnetic>
-						{t.contact.email}
-					</Button>
-					<button
-						class="contact__copy"
-						type="button"
-						data-copy={contact.email}
-						data-copied-label={t.contact.copied}
-					>
-						<Icon name="copy" size={16} class="contact__copy-icon" />
-						<Icon name="check" size={16} class="contact__check-icon" />
-						<span data-copy-label aria-live="polite">{t.contact.copy}</span>
-					</button>
-				</div>
+		<div class="contact__intro">
+			<p class="contact__eyebrow" data-reveal>{t.contact.eyebrow}</p>
+			<h2 class="contact__title" id="contact-title" data-reveal>{contactSection.title}</h2>
+			<p class="contact__description" data-reveal>{contactSection.description}</p>
+			<div class="contact__actions" data-reveal>
+				<Button href={`mailto:${contact.email}`} size="large">{t.contact.email}</Button>
+				<button class="contact__copy link" type="button" data-copy={contact.email} data-copied-label={t.contact.copied}>
+					<Icon name="copy" size={17} class="contact__copy-icon" />
+					<Icon name="check" size={17} class="contact__check-icon" />
+					<span data-copy-label aria-live="polite">{t.contact.copy}</span>
+				</button>
 			</div>
-
-			<ul class="contact__channels" data-reveal-group>
-				{
-					channels.map((channel) => (
-						<li data-reveal>
-							<a
-								class="channel"
-								href={channel.href}
-								target={channel.external ? '_blank' : undefined}
-								rel={channel.external ? 'noopener noreferrer' : undefined}
-							>
-								<Icon name={channel.icon} size={20} />
-								<span class="channel__label label">{channel.label}</span>
-								<span class="channel__value">{channel.value}</span>
-								{channel.external && <span class="sr-only">{t.a11y.opensInNewTab}</span>}
-								<Icon name="arrow-up-right" size={18} class="channel__arrow" />
-							</a>
-						</li>
-					))
-				}
-			</ul>
 		</div>
 
-		<p class="contact__time label">
-			{t.contact.localTime} · {profile.location.city}
+		<ul class="contact__channels" data-reveal-group>
+			{
+				channels.map((channel) => (
+					<li data-reveal>
+						<a
+							class="channel tile"
+							href={channel.href}
+							target={channel.external ? '_blank' : undefined}
+							rel={channel.external ? 'noopener noreferrer' : undefined}
+						>
+							<Icon name={channel.icon} size={26} class="channel__icon" />
+							<span class="channel__label">{channel.label}</span>
+							<span class="channel__value">{channel.value}</span>
+							{channel.external && <span class="sr-only">{t.a11y.opensInNewTab}</span>}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+
+		<p class="contact__time">
+			{t.contact.localTime} {profile.location.city}:
 			<time class="contact__clock" data-clock data-time-zone={profile.location.timeZone}>--:--</time>
 		</p>
 	</div>
 </section>
 
 <style>
-	.contact {
-		overflow: clip;
-		isolation: isolate;
+	.contact__intro {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
 	}
 
-	.contact__glow {
-		position: absolute;
-		z-index: -1;
-		left: 50%;
-		bottom: -40%;
-		width: min(90rem, 140vw);
-		aspect-ratio: 2;
-		translate: -50% 0;
-		background: radial-gradient(ellipse at center, rgb(255 106 61 / 0.18), transparent 60%);
+	.contact__eyebrow {
+		font-size: var(--fs-subtitle);
+		font-weight: 600;
+		letter-spacing: -0.015em;
+		color: var(--text-secondary);
 	}
 
 	.contact__title {
-		font-size: var(--step-display);
-		line-height: 0.92;
-		letter-spacing: -0.055em;
-		max-width: 12ch;
-	}
-
-	.contact__grid {
-		display: grid;
-		gap: 3rem;
-		margin-top: clamp(3rem, 2rem + 4vw, 6rem);
-	}
-
-	.contact__cta {
-		display: grid;
-		gap: 2rem;
-		align-content: start;
+		max-width: 14ch;
+		margin-top: 0.5rem;
+		font-size: var(--fs-hero);
+		font-weight: 700;
+		line-height: 1;
+		letter-spacing: -0.035em;
 	}
 
 	.contact__description {
-		max-width: 36ch;
-		font-size: var(--step-lead);
-		color: var(--text-muted);
-		line-height: 1.5;
+		max-width: 36rem;
+		margin-top: 1.5rem;
+		font-size: var(--fs-lead);
+		color: var(--text-secondary);
 	}
 
 	.contact__actions {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.75rem;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem 2rem;
+		margin-top: 2.25rem;
 	}
 
 	.contact__copy {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.6rem;
-		min-height: 3rem;
-		padding-inline: 1.25rem;
-		border-radius: 999px;
-		border: 1px solid var(--line-strong);
-		font-size: var(--step-meta);
-		color: var(--text-muted);
-		transition:
-			color var(--dur-micro) var(--ease-out),
-			border-color var(--dur-micro) var(--ease-out);
+		gap: 0.45rem;
+		min-height: 2.75rem;
+		font-size: var(--fs-lead);
 	}
 
 	.contact__copy[hidden] {
 		display: none;
-	}
-
-	.contact__copy:hover {
-		color: var(--text);
-		border-color: var(--text-muted);
 	}
 
 	.contact__copy :global(.contact__check-icon),
@@ -168,79 +118,66 @@ const channels: { label: string; value: string; href: string; icon: IconName; ex
 
 	.contact__copy:global(.is-copied) :global(.contact__check-icon) {
 		display: block;
-		color: #4ade80;
+		color: var(--success);
+	}
+
+	.contact__channels {
+		display: grid;
+		gap: 1rem;
+		margin-top: clamp(4rem, 3rem + 4vw, 6rem);
 	}
 
 	.channel {
 		display: grid;
-		grid-template-columns: auto 1fr auto;
-		grid-template-areas:
-			'icon label arrow'
-			'icon value arrow';
-		align-items: center;
-		gap: 0.25rem 1rem;
-		padding-block: 1.5rem;
-		border-bottom: 1px solid var(--line);
-		transition: border-color var(--dur-micro) var(--ease-out);
+		gap: 0.2rem;
+		height: 100%;
+		transition: transform var(--dur-component) var(--ease-out);
 	}
 
-	.channel > :global(svg:first-child) {
-		grid-area: icon;
-		color: var(--text-muted);
+	.channel :global(.channel__icon) {
+		margin-bottom: 1.25rem;
+		color: var(--text-secondary);
 		transition: color var(--dur-micro) var(--ease-out);
 	}
 
 	.channel__label {
-		grid-area: label;
+		font-size: var(--fs-small);
+		color: var(--text-secondary);
 	}
 
 	.channel__value {
-		grid-area: value;
-		font-size: var(--step-h3);
+		font-size: var(--fs-lead);
+		font-weight: 600;
 		letter-spacing: -0.02em;
 		overflow-wrap: anywhere;
-		transition: transform var(--dur-component) var(--ease-out);
 	}
 
-	.channel :global(.channel__arrow) {
-		grid-area: arrow;
-		color: var(--text-muted);
-		transition:
-			transform var(--dur-component) var(--ease-out),
-			color var(--dur-micro) var(--ease-out);
-	}
+	@media (hover: hover) {
+		.channel:hover {
+			transform: scale(1.02);
+		}
 
-	.channel:hover {
-		border-color: var(--accent);
-	}
-
-	.channel:hover .channel__value {
-		transform: translateX(0.5rem);
-	}
-
-	.channel:hover :global(svg) {
-		color: var(--accent);
-	}
-
-	.channel:hover :global(.channel__arrow) {
-		transform: translate(3px, -3px);
+		.channel:hover :global(.channel__icon) {
+			color: var(--accent);
+		}
 	}
 
 	.contact__time {
-		display: flex;
-		gap: 0.75rem;
-		margin-top: 4rem;
+		margin-top: 3rem;
+		text-align: center;
+		font-size: var(--fs-small);
+		color: var(--text-secondary);
 	}
 
 	.contact__clock {
 		color: var(--text);
+		font-weight: 600;
 		font-variant-numeric: tabular-nums;
 	}
 
-	@media (min-width: 64rem) {
-		.contact__grid {
-			grid-template-columns: 5fr 7fr;
-			gap: 4rem;
+	@media (min-width: 48rem) {
+		.contact__channels {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
 		}
 	}
 </style>

@@ -33,7 +33,7 @@ const person = {
 	worksFor: experience
 		.filter((item) => !item.end)
 		.map((item) => ({ '@type': 'Organization', name: item.company })),
-	knowsAbout: skills.flatMap((group) => group.items.map((item) => item.name)),
+	knowsAbout: skills.flatMap((group) => group.items),
 };
 
 const jsonLd = {
@@ -76,7 +76,9 @@ const jsonLd = {
 }
 
 <meta name="author" content={profile.name} />
-<meta name="theme-color" content="#0a0a0b" />
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+<meta name="color-scheme" content="light dark" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="sitemap" href="/sitemap.xml" />

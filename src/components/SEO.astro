@@ -76,6 +76,7 @@ const jsonLd = {
 }
 
 <meta name="author" content={profile.name} />
+<!-- Updated by src/scripts/theme.ts when the visitor picks a theme. -->
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
 <meta name="color-scheme" content="light dark" />
@@ -103,5 +104,6 @@ const jsonLd = {
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={title} />
 
 {indexable && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}

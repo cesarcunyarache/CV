@@ -62,7 +62,12 @@ function initCopyButtons() {
 		const original = label?.textContent ?? '';
 		button.hidden = !navigator.clipboard;
 		button.addEventListener('click', async () => {
-			await navigator.clipboard.writeText(button.dataset.copy ?? '');
+			try {
+				await navigator.clipboard.writeText(button.dataset.copy ?? '');
+			} catch {
+				// Permission denied or document not focused: the mailto button still works.
+				return;
+			}
 			button.classList.add('is-copied');
 			if (label) label.textContent = button.dataset.copiedLabel ?? original;
 			setTimeout(() => {

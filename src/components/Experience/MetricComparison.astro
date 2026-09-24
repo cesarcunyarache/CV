@@ -27,7 +27,7 @@ const reduction = new Intl.NumberFormat(locale, { style: 'percent', maximumFract
 		<span class="metric__unit" aria-hidden="true">{metric.unit}</span>
 	</p>
 
-	<p class="metric__delta">−{reduction} {t.experience.reduction}</p>
+	<p class="metric__delta">{reduction} {t.experience.reduction}</p>
 
 	{
 		blocks.length > 0 ? (

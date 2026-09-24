@@ -45,7 +45,8 @@ const { current, label } = Astro.props;
 		min-width: 2.25rem;
 		min-height: 1.85rem;
 		border-radius: 999px;
-		color: var(--text-secondary);
+		/* Slightly darker than --text-secondary: it sits on the tinted track */
+		color: light-dark(#56565b, var(--text-secondary));
 		transition:
 			color var(--dur-micro) var(--ease-out),
 			background-color var(--dur-micro) var(--ease-out);

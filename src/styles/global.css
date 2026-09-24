@@ -20,7 +20,10 @@
 	--accent-fill-hover: #1e7cf2;
 	--on-accent: #ffffff;
 	--success: light-dark(#1f8a3b, #34c759);
-	--nav-bg: light-dark(rgb(255 255 255 / 0.76), rgb(22 22 23 / 0.76));
+	/* Frosted glass (navigation) */
+	--glass-bg: light-dark(rgb(255 255 255 / 0.66), rgb(30 30 32 / 0.6));
+	--glass-border: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.12));
+	--glass-highlight: light-dark(rgb(255 255 255 / 0.8), rgb(255 255 255 / 0.07));
 	--shadow-color: light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.85));
 
 	/*

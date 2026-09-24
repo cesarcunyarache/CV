@@ -1,7 +1,10 @@
 ---
 /**
- * The layers of a business system in CSS 3D. As the hero scrolls away the
- * layers separate into an exploded view (`--progress` from the hero).
+ * The layers of a business system in CSS 3D.
+ *
+ * Entrance: the scene tilts into place while the layers drop in one by one.
+ * Scroll:   driven by `--explode` (0 → 1) from the hero, the layers separate
+ *           into an exploded view and the scene turns slightly.
  */
 interface Props {
 	layers: readonly string[];
@@ -14,12 +17,14 @@ const coreIndex = Math.min(2, layers.length - 1);
 
 <figure class="stack" role="img" aria-label={label}>
 	<div class="stack__scene" aria-hidden="true">
+		<div class="stack__floor"></div>
 		{
 			layers.map((layer, index) => (
 				<div
 					class:list={['stack__layer', { 'is-core': index === coreIndex }]}
-					style={`--z: ${layers.length - 1 - index}`}
+					style={`--z: ${layers.length - 1 - index}; --order: ${index}`}
 				>
+					<span class="stack__index">{String(index + 1).padStart(2, '0')}</span>
 					<span class="stack__name">{layer}</span>
 				</div>
 			))
@@ -28,69 +33,139 @@ const coreIndex = Math.min(2, layers.length - 1);
 </figure>
 
 <style>
+	/* `--explode` (0 → 1) is inherited from the hero; 0 when used elsewhere. */
 	.stack {
-		--gap: clamp(1.75rem, 1rem + 3vw, 3.75rem);
+		/*
+		 * Sized from the space the hero leaves for it (container query units),
+		 * so the whole stack is always visible on first load.
+		 */
+		--gap: clamp(0.6rem, 8.5cqh, 3rem);
 
 		display: grid;
 		place-items: center;
-		width: min(100%, 44rem);
-		aspect-ratio: 16 / 11;
-		margin-inline: auto;
-		perspective: 2000px;
+		width: 100%;
+		height: 100%;
+		perspective: 2200px;
 	}
 
 	.stack__scene {
 		position: relative;
-		width: 58%;
+		width: min(30rem, 62cqw, 66cqh);
 		aspect-ratio: 1;
 		transform-style: preserve-3d;
-		transform: rotateX(60deg) rotateZ(-45deg);
+		transform: rotateX(calc(60deg - var(--explode, 0) * 6deg)) rotateZ(calc(-45deg + var(--explode, 0) * 12deg));
+		animation: scene-in 1.8s var(--ease-out) backwards;
 	}
 
 	.stack__layer {
 		position: absolute;
 		inset: 0;
 		display: flex;
-		align-items: flex-end;
-		justify-content: flex-end;
-		padding: 7% 8%;
+		flex-direction: column;
+		justify-content: space-between;
+		padding: 8% 9%;
 		border-radius: 12%;
-		background: light-dark(rgb(255 255 255 / 0.92), rgb(38 38 41 / 0.9));
+		background: light-dark(rgb(255 255 255 / 0.94), rgb(40 40 43 / 0.92));
 		box-shadow:
 			inset 0 0 0 1px var(--line-soft),
+			inset 0 1px 0 light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.08)),
 			0 30px 50px -20px var(--shadow-color);
-		/* Exploded view: layers drift apart as the hero scrolls */
-		transform: translateZ(calc((var(--z) - 1.5) * var(--gap) * (1 + var(--progress, 0) * 1.6)));
-		animation: settle 1.4s var(--ease-out) both;
-		animation-delay: calc(200ms + var(--z) * 90ms);
+		overflow: hidden;
+		/* Exploded view: spacing grows up to 2.8× while scrolling */
+		transform: translateZ(calc((var(--z) - 1.5) * var(--gap) * (1 + var(--explode, 0) * 1.8)));
+		animation: layer-in 1.3s var(--ease-out) backwards;
+		animation-delay: calc(250ms + var(--order) * 120ms);
 	}
 
 	.stack__layer.is-core {
-		background: linear-gradient(135deg, #3d8bff, var(--accent-fill));
-		box-shadow: 0 30px 60px -20px rgb(10 108 230 / 0.55);
+		background: linear-gradient(135deg, #4b95ff, var(--accent-fill) 60%, #0757c2);
+		box-shadow:
+			inset 0 1px 0 rgb(255 255 255 / 0.35),
+			0 30px 70px -18px rgb(10 108 230 / calc(0.45 + var(--explode, 0) * 0.25));
 	}
 
+	/* One-time light sweep across the core layer after it lands */
+	.stack__layer.is-core::after {
+		content: '';
+		position: absolute;
+		inset: -50%;
+		background: linear-gradient(115deg, transparent 42%, rgb(255 255 255 / 0.45) 50%, transparent 58%);
+		transform: translateX(-60%);
+		animation: sheen 1.6s var(--ease-out) 1.4s both;
+	}
+
+	.stack__index,
 	.stack__name {
-		font-size: clamp(0.6875rem, 0.55rem + 0.5vw, 0.9375rem);
+		position: relative;
 		font-weight: 600;
 		letter-spacing: -0.01em;
 		color: var(--text-secondary);
 	}
 
+	.stack__index {
+		font-size: clamp(0.625rem, 0.5rem + 0.4vw, 0.8125rem);
+		font-variant-numeric: tabular-nums;
+		opacity: calc(0.4 + var(--explode, 0) * 0.6);
+	}
+
+	.stack__name {
+		align-self: flex-end;
+		font-size: clamp(0.75rem, 0.6rem + 0.5vw, 1rem);
+	}
+
+	.is-core .stack__index,
 	.is-core .stack__name {
 		color: #fff;
 	}
 
-	@keyframes settle {
+	/* Soft contact shadow under the stack */
+	.stack__floor {
+		position: absolute;
+		inset: -8%;
+		border-radius: 50%;
+		background: radial-gradient(closest-side, var(--shadow-color), transparent);
+		opacity: calc(0.5 - var(--explode, 0) * 0.3);
+		transform: translateZ(calc(-2.5 * var(--gap) * (1 + var(--explode, 0) * 1.8)));
+		animation: fade-in 1.6s var(--ease-out) 600ms backwards;
+	}
+
+	@keyframes scene-in {
 		from {
 			opacity: 0;
-			transform: translateZ(calc((var(--z) - 1.5) * var(--gap) * 2.4));
+			transform: rotateX(72deg) rotateZ(-70deg) scale(0.86);
+		}
+	}
+
+	@keyframes layer-in {
+		from {
+			opacity: 0;
+			transform: translateZ(calc((var(--z) + 3) * var(--gap) * 1.6));
+		}
+	}
+
+	@keyframes sheen {
+		to {
+			transform: translateX(60%);
+		}
+	}
+
+	@keyframes fade-in {
+		from {
+			opacity: 0;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.stack__scene {
+			transform: rotateX(60deg) rotateZ(-45deg);
+		}
+
 		.stack__layer {
-			transform: translateZ(calc((var(--z) - 1.5) * var(--gap)));
+			transform: translateZ(calc((var(--z) - 1.5) * var(--gap) * 1.4));
+		}
+
+		.stack__layer.is-core::after {
+			display: none;
 		}
 	}
 </style>

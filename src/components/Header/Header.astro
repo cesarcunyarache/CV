@@ -13,43 +13,55 @@ const { locale, content } = Astro.props;
 const { data, t } = content;
 const home = localePath(locale);
 const items = t.navItems.map((id) => ({ id, label: t.nav[id], href: `${home}#${id}` }));
+
+/*
+ * States (classes set by src/scripts/navigation.ts):
+ *   is-scrolled   the full-width bar becomes a floating glass capsule
+ *   is-hidden     slides away while scrolling down, returns on scroll up
+ *   is-menu-open  mobile glass panel is open
+ */
 ---
 
 <div class="nav-sentinel" data-header-sentinel aria-hidden="true"></div>
 <header class="nav" data-header>
-	<div class="nav__bar container">
-		<a class="nav__brand" href={`${home}#top`}>{data.profile.shortName}</a>
+	<div class="nav__scrim" data-menu-scrim aria-hidden="true"></div>
 
-		<nav class="nav__links" aria-label={t.a11y.mainNav}>
-			<ul>
-				{
-					items.map((item) => (
-						<li>
-							<a class="nav__link" href={item.href} data-nav-link>
-								{item.label}
-							</a>
-						</li>
-					))
-				}
-			</ul>
-		</nav>
+	<div class="nav__shell">
+		<div class="nav__bar">
+			<a class="nav__brand" href={`${home}#top`}>{data.profile.shortName}</a>
 
-		<div class="nav__actions">
-			<LanguageSwitcher current={locale} label={t.a11y.languageSwitcher} />
-			<ThemeToggle label={t.a11y.themeToggle} />
-			<button
-				class="nav__toggle"
-				type="button"
-				aria-expanded="false"
-				aria-controls="mobile-menu"
-				aria-label={t.a11y.openMenu}
-				data-menu-toggle
-				data-label-open={t.a11y.openMenu}
-				data-label-close={t.a11y.closeMenu}
-			>
-				<span class="nav__toggle-line" aria-hidden="true"></span>
-				<span class="nav__toggle-line" aria-hidden="true"></span>
-			</button>
+			<nav class="nav__links" aria-label={t.a11y.mainNav} data-nav-list>
+				<span class="nav__indicator" data-nav-indicator aria-hidden="true"></span>
+				<ul>
+					{
+						items.map((item) => (
+							<li>
+								<a class="nav__link" href={item.href} data-nav-link>
+									{item.label}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
+
+			<div class="nav__actions">
+				<LanguageSwitcher current={locale} label={t.a11y.languageSwitcher} />
+				<ThemeToggle label={t.a11y.themeToggle} />
+				<button
+					class="nav__toggle"
+					type="button"
+					aria-expanded="false"
+					aria-controls="mobile-menu"
+					aria-label={t.a11y.openMenu}
+					data-menu-toggle
+					data-label-open={t.a11y.openMenu}
+					data-label-close={t.a11y.closeMenu}
+				>
+					<span class="nav__toggle-line" aria-hidden="true"></span>
+					<span class="nav__toggle-line" aria-hidden="true"></span>
+				</button>
+			</div>
 		</div>
 	</div>
 
@@ -82,57 +94,109 @@ const items = t.navItems.map((id) => ({ id, label: t.nav[id], href: `${home}#${i
 		position: fixed;
 		inset: 0 0 auto;
 		z-index: 50;
+		padding-inline: var(--gutter);
+		pointer-events: none;
+		transition: transform 600ms var(--ease-out);
+	}
+
+	.nav.is-hidden:not(.is-menu-open) {
+		transform: translateY(calc(-100% - 4rem));
+	}
+
+	/* ── Shell: full-width bar at the top, floating glass capsule after scrolling ── */
+	.nav__shell {
+		position: relative;
+		max-width: calc(var(--container) - 2 * var(--gutter));
+		margin-inline: auto;
+		border-radius: 1.5rem;
+		pointer-events: auto;
+		background: transparent;
+		box-shadow:
+			inset 0 0 0 1px transparent,
+			0 0 0 transparent;
+		transition:
+			max-width 700ms var(--ease-out),
+			transform 700ms var(--ease-out),
+			background-color 500ms var(--ease-out),
+			box-shadow 500ms var(--ease-out),
+			-webkit-backdrop-filter 500ms var(--ease-out),
+			backdrop-filter 500ms var(--ease-out);
+	}
+
+	.nav.is-scrolled .nav__shell,
+	.nav.is-menu-open .nav__shell {
+		max-width: 50rem;
+		transform: translateY(0.75rem);
+		background: var(--glass-bg);
+		-webkit-backdrop-filter: blur(24px) saturate(180%);
+		backdrop-filter: blur(24px) saturate(180%);
+		box-shadow:
+			inset 0 0 0 1px var(--glass-border),
+			inset 0 1px 0 var(--glass-highlight),
+			0 12px 40px -14px var(--shadow-color);
 	}
 
 	.nav__bar {
-		position: relative;
-		z-index: 2;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 1rem;
 		height: var(--header-height);
+		padding-inline: 0;
+		transition: padding 700ms var(--ease-out);
 	}
 
-	/* Translucent bar spanning the full width */
-	.nav::before {
-		content: '';
-		position: absolute;
-		inset: 0 0 auto;
-		z-index: 1;
-		height: var(--header-height);
-		background: var(--nav-bg);
-		backdrop-filter: saturate(180%) blur(20px);
-		-webkit-backdrop-filter: saturate(180%) blur(20px);
-		box-shadow: 0 1px 0 transparent;
-		transition: box-shadow var(--dur-component) var(--ease-out);
-	}
-
-	.nav:global(.is-scrolled)::before {
-		box-shadow: 0 1px 0 var(--line-soft);
+	.nav.is-scrolled .nav__bar,
+	.nav.is-menu-open .nav__bar {
+		padding-inline: 1.1rem 0.4rem;
 	}
 
 	.nav__brand {
-		font-size: 1.0625rem;
+		font-size: 1rem;
 		font-weight: 600;
 		letter-spacing: -0.02em;
+		white-space: nowrap;
 	}
 
+	/* ── Desktop links with a sliding highlight ── */
 	.nav__links {
+		position: relative;
 		display: none;
 	}
 
 	.nav__links ul {
+		position: relative;
 		display: flex;
-		gap: 0.25rem;
+	}
+
+	.nav__indicator {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		width: var(--w, 0);
+		height: 2rem;
+		border-radius: 999px;
+		background: var(--line-soft);
+		opacity: 0;
+		translate: var(--x, 0) -50%;
+		transition:
+			translate 450ms var(--ease-out),
+			width 450ms var(--ease-out),
+			opacity 250ms var(--ease-out);
+	}
+
+	.nav__indicator.is-visible {
+		opacity: 1;
 	}
 
 	.nav__link {
+		position: relative;
 		display: inline-flex;
 		align-items: center;
 		min-height: 2.75rem;
 		padding-inline: 0.85rem;
 		font-size: var(--fs-caption);
+		font-weight: 500;
 		color: var(--text-secondary);
 		transition: color var(--dur-micro) var(--ease-out);
 	}
@@ -145,78 +209,123 @@ const items = t.navItems.map((id) => ({ id, label: t.nav[id], href: `${home}#${i
 	.nav__actions {
 		display: flex;
 		align-items: center;
-		gap: 0.35rem;
+		gap: 0.25rem;
 	}
 
+	/* ── Mobile toggle ── */
 	.nav__toggle {
 		display: grid;
 		place-content: center;
-		gap: 7px;
+		gap: 6px;
 		width: 2.75rem;
 		height: 2.75rem;
+		border-radius: 50%;
+		transition: background-color var(--dur-micro) var(--ease-out);
+	}
+
+	.nav__toggle:hover {
+		background: var(--line-soft);
 	}
 
 	.nav__toggle-line {
 		display: block;
-		width: 1.05rem;
+		width: 1rem;
 		height: 1.5px;
 		border-radius: 1px;
 		background: currentColor;
 		transition: transform var(--dur-component) var(--ease-out);
 	}
 
-	.nav:global(.is-menu-open) .nav__toggle-line:first-child {
-		transform: translateY(4.25px) rotate(45deg);
+	.nav.is-menu-open .nav__toggle-line:first-child {
+		transform: translateY(3.75px) rotate(45deg);
 	}
 
-	.nav:global(.is-menu-open) .nav__toggle-line:last-child {
-		transform: translateY(-4.25px) rotate(-45deg);
+	.nav.is-menu-open .nav__toggle-line:last-child {
+		transform: translateY(-3.75px) rotate(-45deg);
 	}
 
-	/* Mobile full-screen menu */
+	/* ── Mobile glass panel ── */
+	/* Sibling of the shell: nested backdrop-filters would not blur the page */
 	.nav__menu {
-		position: fixed;
-		inset: 0;
-		z-index: 1;
-		padding: calc(var(--header-height) + 1.5rem) var(--gutter) 2rem;
-		background: var(--bg);
-		visibility: hidden;
+		position: absolute;
+		top: calc(var(--header-height) + 1.25rem);
+		inset-inline: var(--gutter);
+		padding: 0.5rem;
+		border-radius: 1.5rem;
+		background: var(--glass-bg);
+		-webkit-backdrop-filter: blur(24px) saturate(180%);
+		backdrop-filter: blur(24px) saturate(180%);
+		box-shadow:
+			inset 0 0 0 1px var(--glass-border),
+			inset 0 1px 0 var(--glass-highlight),
+			0 20px 50px -18px var(--shadow-color);
+		transform-origin: top center;
+		transform: translateY(-0.5rem) scale(0.96);
 		opacity: 0;
+		visibility: hidden;
 		transition:
-			opacity var(--dur-component) var(--ease-out),
-			visibility 0s linear var(--dur-component);
+			transform 500ms var(--ease-out),
+			opacity 300ms var(--ease-out),
+			visibility 0s linear 500ms;
 	}
 
-	.nav:global(.is-menu-open) .nav__menu {
-		visibility: visible;
+	.nav.is-menu-open .nav__menu {
+		transform: none;
 		opacity: 1;
-		transition: opacity var(--dur-component) var(--ease-out);
+		visibility: visible;
+		transition:
+			transform 500ms var(--ease-out),
+			opacity 300ms var(--ease-out);
 	}
 
 	.nav__menu li {
 		opacity: 0;
-		transform: translateY(-0.5rem);
+		transform: translateY(-0.4rem);
 		transition:
-			opacity var(--dur-component) var(--ease-out),
-			transform var(--dur-component) var(--ease-out);
-		transition-delay: calc(var(--i) * 40ms + 80ms);
+			opacity 400ms var(--ease-out),
+			transform 400ms var(--ease-out);
+		transition-delay: calc(var(--i) * 45ms + 60ms);
 	}
 
-	.nav:global(.is-menu-open) .nav__menu li {
+	.nav.is-menu-open .nav__menu li {
 		opacity: 1;
 		transform: none;
 	}
 
 	.nav__menu-link {
 		display: block;
-		padding-block: 0.6rem;
-		font-size: 1.75rem;
+		padding: 0.8rem 1rem;
+		border-radius: 1rem;
+		font-size: 1.375rem;
 		font-weight: 600;
-		letter-spacing: -0.025em;
+		letter-spacing: -0.022em;
+		transition: background-color var(--dur-micro) var(--ease-out);
 	}
 
+	.nav__menu-link:hover,
 	.nav__menu-link[aria-current] {
-		color: var(--text-secondary);
+		background: var(--line-soft);
+	}
+
+	/* Dim and blur the page behind the open menu */
+	.nav__scrim {
+		position: fixed;
+		inset: 0;
+		background: rgb(0 0 0 / 0.2);
+		-webkit-backdrop-filter: blur(6px);
+		backdrop-filter: blur(6px);
+		opacity: 0;
+		visibility: hidden;
+		transition:
+			opacity 400ms var(--ease-out),
+			visibility 0s linear 400ms;
+	}
+
+	.nav.is-menu-open .nav__scrim {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+		transition: opacity 400ms var(--ease-out);
 	}
 
 	@media (min-width: 48rem) {
@@ -225,8 +334,15 @@ const items = t.navItems.map((id) => ({ id, label: t.nav[id], href: `${home}#${i
 		}
 
 		.nav__toggle,
-		.nav__menu {
+		.nav__menu,
+		.nav__scrim {
 			display: none;
+		}
+	}
+
+	@media (max-width: 29.99rem) {
+		.nav__brand {
+			font-size: 0.9375rem;
 		}
 	}
 </style>

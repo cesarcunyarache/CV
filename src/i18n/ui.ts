@@ -83,6 +83,7 @@ export const ui = {
 	hero: {
 		ctaWork: { es: 'Ver proyectos', en: 'View work' },
 		ctaContact: { es: 'Hablemos', en: "Let's talk" },
+		scrollHint: { es: 'Desliza para ver las capas', en: 'Scroll to explore the layers' },
 		layers: {
 			es: ['Interfaz', 'API REST', 'Reglas de negocio', 'Base de datos'],
 			en: ['Interface', 'REST API', 'Business rules', 'Database'],

@@ -1,4 +1,6 @@
 ---
+import TechMarquee from './TechMarquee.astro';
+import BrandLogo from '../ui/BrandLogo.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import type { Content } from '../../data';
 
@@ -9,20 +11,28 @@ interface Props {
 const { data, t } = Astro.props.content;
 const technologyGroups = data.skills.filter((group) => group.kind === 'technologies');
 const conceptGroups = data.skills.filter((group) => group.kind === 'concepts');
+const allTechnologies = technologyGroups.flatMap((group) => group.items);
 ---
 
 <section class="skills section" id="stack" aria-labelledby="stack-title">
 	<div class="container">
 		<SectionHeading title={t.headings.stack.title} subtitle={t.headings.stack.subtitle} id="stack-title" />
+	</div>
 
+	<TechMarquee items={allTechnologies} />
+
+	<div class="container">
 		<div class="skills__bento" data-reveal-group>
 			{
 				technologyGroups.map((group) => (
-					<div class="skills__group tile" data-reveal>
+					<div class="skills__group tile" data-reveal data-spotlight>
 						<h3 class="skills__group-title">{group.title}</h3>
 						<ul class="skills__tech">
-							{group.items.map((item) => (
-								<li>{item}</li>
+							{group.items.map((item, k) => (
+								<li class="tech" style={`--k: ${k}`}>
+									<BrandLogo name={item} size={26} class="tech__logo" />
+									{item}
+								</li>
 							))}
 						</ul>
 					</div>
@@ -70,23 +80,52 @@ const conceptGroups = data.skills.filter((group) => group.kind === 'concepts');
 	.skills__tech {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.1em 0.5em;
+		gap: 0.6rem;
 		margin-top: auto;
-		font-size: var(--fs-title);
+	}
+
+	/* Logo chips; brand colour on the logo, lift on hover */
+	.tech {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.55rem 1rem 0.55rem 0.7rem;
+		border-radius: 999px;
+		background: var(--bg);
+		box-shadow: inset 0 0 0 1px var(--line-soft);
+		font-size: var(--fs-lead);
 		font-weight: 600;
-		line-height: 1.15;
-		letter-spacing: -0.03em;
+		letter-spacing: -0.02em;
+		transition:
+			transform var(--dur-component) var(--ease-out),
+			box-shadow var(--dur-component) var(--ease-out),
+			opacity 600ms var(--ease-out),
+			scale 600ms var(--ease-out);
+		transition-delay: 0ms, 0ms, calc(250ms + var(--k) * 70ms), calc(250ms + var(--k) * 70ms);
 	}
 
-	.skills__tech li {
-		transition: color var(--dur-micro) var(--ease-out);
+	.tech :global(.tech__logo) {
+		color: var(--brand, var(--text));
+		transition: transform var(--dur-component) var(--ease-out);
 	}
 
-	/* Hovering one technology dims the rest of its group */
 	@media (hover: hover) {
-		.skills__tech:hover li:not(:hover) {
-			color: var(--text-secondary);
+		.tech:hover {
+			transform: translateY(-3px);
+			box-shadow:
+				inset 0 0 0 1px var(--line-soft),
+				0 12px 24px -12px var(--shadow-color);
 		}
+
+		.tech:hover :global(.tech__logo) {
+			transform: rotate(-8deg) scale(1.12);
+		}
+	}
+
+	/* Chips pop in one by one once their tile is revealed */
+	:global(.js) .skills__group:not(:global(.is-visible)) .tech {
+		opacity: 0;
+		scale: 0.85;
 	}
 
 	.skills__subheading {
@@ -109,6 +148,13 @@ const conceptGroups = data.skills.filter((group) => group.kind === 'concepts');
 		padding-block: 0.85rem;
 		border-bottom: 1px solid var(--line);
 		font-size: var(--fs-lead);
+		transition: translate var(--dur-component) var(--ease-out);
+	}
+
+	@media (hover: hover) {
+		.skills__concept-list li:hover {
+			translate: 0.4rem 0;
+		}
 	}
 
 	@media (min-width: 48rem) {

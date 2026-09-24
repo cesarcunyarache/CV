@@ -35,9 +35,12 @@ export interface AboutContent {
 	facts: { label: Localized; value: Localized }[];
 }
 
+export type PrincipleIcon = 'process' | 'rules' | 'architecture' | 'performance';
+
 export interface Principle {
 	title: Localized;
 	description: Localized;
+	icon: PrincipleIcon;
 }
 
 /** A before/after measurement rendered as an animated comparison. */
@@ -46,6 +49,8 @@ export interface Metric {
 	unit: Localized;
 	before: number;
 	after: number;
+	/** `blocks` draws one block per unit (small counts, e.g. 8 → 1 queries). Default: `bars`. */
+	visual?: 'bars' | 'blocks';
 }
 
 export interface Experience {
@@ -99,6 +104,8 @@ export interface Education {
 
 export interface Certification {
 	name: string;
+	/** Brand logo key, e.g. `cisco`, `python`, `google` (see src/components/ui/brand-icons.ts). */
+	icon?: string;
 	issuer?: string;
 	year?: number;
 	url?: string;

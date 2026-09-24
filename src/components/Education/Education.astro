@@ -28,7 +28,7 @@ const yearsOf = (start: string, end?: string) => {
 			<div class="education__degrees">
 				{
 					data.education.map((item) => (
-						<article class="degree tile" data-reveal>
+						<article class="degree tile" data-reveal data-spotlight>
 							<p class="degree__range">{formatRange(item.start, item.end, locale, t.experience.present)}</p>
 							<h3 class="degree__title">{item.degree}</h3>
 							<p class="degree__institution">

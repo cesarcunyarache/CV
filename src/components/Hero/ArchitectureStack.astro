@@ -16,19 +16,21 @@ const coreIndex = Math.min(2, layers.length - 1);
 ---
 
 <figure class="stack" role="img" aria-label={label}>
-	<div class="stack__scene" aria-hidden="true">
-		<div class="stack__floor"></div>
-		{
-			layers.map((layer, index) => (
-				<div
-					class:list={['stack__layer', { 'is-core': index === coreIndex }]}
-					style={`--z: ${layers.length - 1 - index}; --order: ${index}`}
-				>
-					<span class="stack__index">{String(index + 1).padStart(2, '0')}</span>
-					<span class="stack__name">{layer}</span>
-				</div>
-			))
-		}
+	<div class="stack__tilt" aria-hidden="true">
+		<div class="stack__scene">
+			<div class="stack__floor"></div>
+			{
+				layers.map((layer, index) => (
+					<div
+						class:list={['stack__layer', { 'is-core': index === coreIndex }]}
+						style={`--z: ${layers.length - 1 - index}; --order: ${index}`}
+					>
+						<span class="stack__index">{String(index + 1).padStart(2, '0')}</span>
+						<span class="stack__name">{layer}</span>
+					</div>
+				))
+			}
+		</div>
 	</div>
 </figure>
 
@@ -46,6 +48,13 @@ const coreIndex = Math.min(2, layers.length - 1);
 		width: 100%;
 		height: 100%;
 		perspective: 2200px;
+	}
+
+	/* Follows the cursor (--px / --py from the hero), eased; scroll stays on .stack__scene */
+	.stack__tilt {
+		transform-style: preserve-3d;
+		transform: rotateX(calc(var(--py, 0) * -7deg)) rotateY(calc(var(--px, 0) * 9deg));
+		transition: transform 1.2s var(--ease-out);
 	}
 
 	.stack__scene {
@@ -158,6 +167,10 @@ const coreIndex = Math.min(2, layers.length - 1);
 	@media (prefers-reduced-motion: reduce) {
 		.stack__scene {
 			transform: rotateX(60deg) rotateZ(-45deg);
+		}
+
+		.stack__tilt {
+			transform: none;
 		}
 
 		.stack__layer {

@@ -1,4 +1,5 @@
 ---
+import BrandLogo from '../ui/BrandLogo.astro';
 import Icon from '../ui/Icon.astro';
 import type { ResolvedPortfolio } from '../../data';
 
@@ -19,8 +20,13 @@ const { title, items, newTabLabel } = Astro.props;
 				const details = [item.issuer, item.year].filter(Boolean).join(' · ');
 				const body = (
 					<>
-						<span class="cert__name">{item.name}</span>
-						{details && <span class="cert__details">{details}</span>}
+						<span class="cert__logo" aria-hidden="true">
+							<BrandLogo name={item.icon ?? item.name} size={22} />
+						</span>
+						<span class="cert__text">
+							<span class="cert__name">{item.name}</span>
+							{details && <span class="cert__details">{details}</span>}
+						</span>
 					</>
 				);
 				return (
@@ -53,7 +59,43 @@ const { title, items, newTabLabel } = Astro.props;
 	.cert,
 	.cert__link {
 		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 1rem;
+		align-items: center;
+	}
+
+	.cert__text {
+		display: grid;
 		gap: 0.2rem;
+	}
+
+	/* Logo in a small app-icon style badge; brand colour on hover */
+	.cert__logo {
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 0.8rem;
+		background: var(--surface-raised);
+		box-shadow: inset 0 0 0 1px var(--line-soft);
+		color: var(--text-secondary);
+		transition:
+			transform var(--dur-component) var(--ease-out),
+			color var(--dur-component) var(--ease-out);
+	}
+
+	.cert__logo :global(svg) {
+		color: inherit;
+	}
+
+	@media (hover: hover) {
+		.cert:hover .cert__logo {
+			transform: scale(1.08) rotate(-4deg);
+		}
+
+		.cert:hover .cert__logo :global(svg) {
+			color: var(--brand, var(--text));
+		}
 	}
 
 	.cert {

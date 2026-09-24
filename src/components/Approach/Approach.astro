@@ -1,4 +1,5 @@
 ---
+import Icon from '../ui/Icon.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import type { Content } from '../../data';
 
@@ -7,76 +8,281 @@ interface Props {
 }
 
 const { data, t } = Astro.props.content;
+const steps = data.principles;
+
+/*
+ * Desktop scroll scene: the section is tall and its stage is sticky.
+ * `--progress` (0 → 1) walks through the steps: the active step lights up
+ * in the list and in the pipeline diagram. Elsewhere it is a plain list.
+ */
 ---
 
-<section class="approach section" id="approach" aria-labelledby="approach-title">
-	<div class="container">
-		<SectionHeading title={t.headings.approach.title} subtitle={t.headings.approach.subtitle} id="approach-title" />
+<section
+	class="approach section"
+	id="approach"
+	aria-labelledby="approach-title"
+	data-progress="sticky"
+	style={`--steps: ${steps.length}`}
+>
+	<div class="approach__stage">
+		<div class="approach__inner container">
+			<div class="approach__text">
+				<SectionHeading title={t.headings.approach.title} subtitle={t.headings.approach.subtitle} id="approach-title" />
 
-		<ol class="approach__grid" data-reveal-group>
-			{
-				data.principles.map((principle, i) => (
-					<li class="approach__step tile" data-reveal>
-						<span class="approach__number" aria-hidden="true">
-							{i + 1}
-						</span>
-						<h3 class="approach__title">{principle.title}</h3>
-						<p class="approach__description">{principle.description}</p>
-					</li>
-				))
-			}
-		</ol>
+				<ol class="approach__steps" data-reveal-group>
+					{
+						steps.map((step, i) => (
+							<li class="approach__step" style={`--i: ${i}`} data-reveal>
+								<span class="approach__icon" aria-hidden="true">
+									<Icon name={step.icon} size={22} />
+								</span>
+								<span class="approach__number" aria-hidden="true">
+									{i + 1}
+								</span>
+								<div>
+									<h3 class="approach__title">{step.title}</h3>
+									<p class="approach__description">{step.description}</p>
+								</div>
+							</li>
+						))
+					}
+				</ol>
+			</div>
+
+			<div class="approach__visual" aria-hidden="true">
+				<div class="approach__pipeline">
+					<span class="approach__line"></span>
+					{
+						steps.map((step, i) => (
+							<div class="approach__node" style={`--i: ${i}`}>
+								<span class="approach__node-icon">
+									<Icon name={step.icon} size={30} />
+								</span>
+								<span class="approach__node-label">{step.title}</span>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</div>
 	</div>
 </section>
 
 <style>
-	.approach__grid {
+	.approach__inner {
+		display: grid;
+		gap: 3rem;
+	}
+
+	.approach__steps {
 		display: grid;
 		gap: 1rem;
 	}
 
 	.approach__step {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
+		position: relative;
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 1.25rem;
+		align-items: start;
+		padding: 1.5rem;
+		border-radius: var(--radius-lg);
+		background: var(--surface);
+	}
+
+	.approach__icon {
+		display: grid;
+		place-items: center;
+		width: 3rem;
+		height: 3rem;
+		border-radius: 0.9rem;
+		background: var(--accent-fill);
+		color: var(--on-accent);
 	}
 
 	.approach__number {
-		display: grid;
-		place-items: center;
-		width: 2.25rem;
-		height: 2.25rem;
-		margin-bottom: auto;
-		border-radius: 50%;
-		background: var(--text);
-		color: var(--bg);
-		font-size: var(--fs-small);
-		font-weight: 600;
+		display: none;
 	}
 
 	.approach__title {
-		margin-top: 1.5rem;
 		font-size: var(--fs-title);
 		letter-spacing: -0.025em;
 	}
 
 	.approach__description {
-		max-width: 34ch;
+		max-width: 36ch;
+		margin-top: 0.4rem;
 		font-size: var(--fs-lead);
 		color: var(--text-secondary);
 	}
 
-	@media (min-width: 48rem) {
-		.approach__grid {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+	.approach__visual {
+		display: none;
+	}
+
+	/* ── Desktop scroll scene ── */
+	@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+		:global(.js) .approach {
+			--progress: 0;
+			/* Active position along the steps: 0 → steps - 1, with a short hold at both ends */
+			--t: clamp(0, calc((var(--progress) * 1.25 - 0.1) * (var(--steps) - 1)), calc(var(--steps) - 1));
+
+			height: calc(var(--steps) * 75svh + 100svh);
+			padding-block: 0;
 		}
 
-		.approach__step {
-			min-height: 18rem;
+		:global(.js) .approach__stage {
+			position: sticky;
+			top: 0;
+			display: flex;
+			align-items: center;
+			height: 100svh;
+			padding-top: var(--header-height);
 		}
 
-		.approach__title {
-			margin-top: 3rem;
+		:global(.js) .approach__inner {
+			grid-template-columns: 7fr 5fr;
+			align-items: center;
+			gap: 4rem;
+		}
+
+		:global(.js) .approach__text :global(.heading) {
+			margin-bottom: 2.5rem;
+			font-size: clamp(2rem, 1.2rem + 2.2vw, 3.25rem);
+		}
+
+		/* How close each step/node is to the active position: 1 = active */
+		:global(.js) .approach__step,
+		:global(.js) .approach__node {
+			--d: max(var(--t) - var(--i), var(--i) - var(--t));
+			--focus: clamp(0, calc(1.6 - var(--d) * 2), 1);
+		}
+
+		:global(.js) .approach__steps {
+			gap: 0.25rem;
+		}
+
+		:global(.js) .approach__step {
+			grid-template-columns: 2.25rem 1fr;
+			padding: 1rem 1.25rem;
+			background: transparent;
+		}
+
+		/* Active card background fades in behind the step */
+		:global(.js) .approach__step::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+			border-radius: inherit;
+			background: var(--surface);
+			opacity: var(--focus);
+			scale: calc(0.96 + var(--focus) * 0.04);
+		}
+
+		:global(.js) .approach__step {
+			isolation: isolate;
+		}
+
+		:global(.js) .approach__icon {
+			display: none;
+		}
+
+		:global(.js) .approach__number {
+			display: grid;
+			place-items: center;
+			width: 2.25rem;
+			height: 2.25rem;
+			margin-top: 0.1rem;
+			border-radius: 50%;
+			background: var(--bg);
+			box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent-fill) calc(var(--focus) * 100%), var(--line));
+			font-size: var(--fs-small);
+			font-weight: 600;
+		}
+
+		:global(.js) .approach__title {
+			font-size: var(--fs-subtitle);
+			color: color-mix(in srgb, var(--text) calc(var(--focus) * 100%), var(--text-secondary));
+		}
+
+		:global(.js) .approach__description {
+			margin-top: 0.3rem;
+			font-size: var(--fs-body);
+		}
+
+		/* Pipeline diagram */
+		:global(.js) .approach__visual {
+			display: grid;
+			place-items: center;
+		}
+
+		.approach__pipeline {
+			position: relative;
+			display: grid;
+			gap: clamp(1.25rem, 4svh, 2.5rem);
+		}
+
+		.approach__line {
+			position: absolute;
+			left: 2.75rem;
+			top: 2.75rem;
+			bottom: 2.75rem;
+			width: 2px;
+			border-radius: 1px;
+			background: var(--line);
+			translate: -50% 0;
+		}
+
+		.approach__line::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+			border-radius: inherit;
+			background: var(--accent-fill);
+			transform-origin: top;
+			transform: scaleY(calc(var(--t) / max(1, var(--steps) - 1)));
+		}
+
+		.approach__node {
+			position: relative;
+			display: flex;
+			align-items: center;
+			gap: 1.25rem;
+		}
+
+		.approach__node-icon {
+			position: relative;
+			display: grid;
+			place-items: center;
+			width: 5.5rem;
+			height: 5.5rem;
+			border-radius: 1.5rem;
+			background: var(--surface);
+			color: color-mix(in srgb, var(--on-accent) calc(var(--focus) * 100%), var(--text-secondary));
+			isolation: isolate;
+			scale: calc(0.9 + var(--focus) * 0.15);
+			box-shadow: 0 20px 40px -18px rgb(10 108 230 / calc(var(--focus) * 0.7));
+			transition: scale 300ms var(--ease-out);
+		}
+
+		/* Accent fill for the active node */
+		.approach__node-icon::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+			border-radius: inherit;
+			background: linear-gradient(135deg, #4b95ff, var(--accent-fill));
+			opacity: var(--focus);
+		}
+
+		.approach__node-label {
+			font-size: var(--fs-lead);
+			font-weight: 600;
+			letter-spacing: -0.02em;
+			color: color-mix(in srgb, var(--text) calc(var(--focus) * 100%), var(--text-secondary));
+			translate: calc(var(--focus) * 0.5rem) 0;
 		}
 	}
 </style>

@@ -22,7 +22,7 @@ const words = about.statement.split(' ');
 				{about.paragraphs.map((paragraph) => <p data-reveal>{paragraph}</p>)}
 			</div>
 
-			<dl class="about__facts tile" data-reveal>
+			<dl class="about__facts tile" data-reveal data-spotlight>
 				{
 					about.facts.map((fact) => (
 						<div class="about__fact">
@@ -33,7 +33,7 @@ const words = about.statement.split(' ');
 				}
 			</dl>
 
-			<div class="about__languages tile" data-reveal>
+			<div class="about__languages tile" data-reveal data-spotlight>
 				<h3>{t.about.languages}</h3>
 				<ul>
 					{

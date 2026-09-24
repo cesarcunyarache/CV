@@ -2,6 +2,7 @@
 /**
  * Two-tone headline: the title, followed by a muted continuation.
  * `Cómo trabajo. Del proceso de negocio a producción.`
+ * Words rise one after another when the heading enters the viewport.
  */
 interface Props {
 	title: string;
@@ -11,11 +12,33 @@ interface Props {
 }
 
 const { title, subtitle, id, align = 'start' } = Astro.props;
+const titleWords = title.split(' ');
+const subtitleWords = subtitle ? subtitle.split(' ') : [];
 ---
 
-<h2 class:list={['heading', `heading--${align}`]} id={id} data-reveal>
-	{title}{subtitle && ' '}
-	{subtitle && <span class="heading__subtitle">{subtitle}</span>}
+<h2 class:list={['heading', `heading--${align}`]} id={id} data-reveal="words">
+	{
+		titleWords.map((word, i) => (
+			<>
+				<span class="word" style={`--w: ${i}`}>
+					{word}
+				</span>{' '}
+			</>
+		))
+	}
+	{
+		subtitleWords.length > 0 && (
+			<span class="heading__subtitle">
+				{subtitleWords.map((word, i) => (
+					<>
+						<span class="word" style={`--w: ${titleWords.length + i}`}>
+							{word}
+						</span>{' '}
+					</>
+				))}
+			</span>
+		)
+	}
 </h2>
 
 <style>

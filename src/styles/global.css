@@ -20,6 +20,7 @@
 	--accent-fill-hover: #1e7cf2;
 	--on-accent: #ffffff;
 	--success: light-dark(#1f8a3b, #34c759);
+	--spotlight: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.08));
 	/* Frosted glass (navigation) */
 	--glass-bg: light-dark(rgb(255 255 255 / 0.66), rgb(30 30 32 / 0.6));
 	--glass-border: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.12));
@@ -168,6 +169,15 @@ p {
 	padding-block: var(--space-section);
 }
 
+/*
+ * Sections below the hero are not styled, laid out or painted until they
+ * approach the viewport. `auto` remembers the real size once rendered.
+ */
+main > section:not(:first-child) {
+	content-visibility: auto;
+	contain-intrinsic-size: auto 1000px;
+}
+
 /* Alternate band: tiles become white (light) / raised (dark) */
 .section--alt {
 	--surface: var(--surface-raised);
@@ -252,6 +262,64 @@ p {
 	transform: none;
 }
 
+/* Headline words rise one after another */
+.js [data-reveal='words'] {
+	opacity: 1;
+	transform: none;
+}
+
+.js [data-reveal='words'] .word {
+	display: inline-block;
+	opacity: 0;
+	transform: translate3d(0, 0.45em, 0);
+	transition:
+		opacity 900ms var(--ease-out),
+		transform 900ms var(--ease-out);
+	transition-delay: calc(var(--w) * 35ms);
+}
+
+.js [data-reveal='words'].is-visible .word {
+	opacity: 1;
+	transform: none;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Pointer effects (src/scripts/pointer.ts, fine pointers only)
+   ────────────────────────────────────────────────────────────── */
+
+/* Soft light that follows the cursor inside a surface */
+[data-spotlight] {
+	position: relative;
+	isolation: isolate;
+}
+
+[data-spotlight]::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	border-radius: inherit;
+	background: radial-gradient(24rem circle at var(--mx, 50%) var(--my, 50%), var(--spotlight), transparent 60%);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 400ms var(--ease-out);
+}
+
+[data-spotlight]:hover::after {
+	opacity: 1;
+}
+
+/* Subtle 3D tilt towards the cursor */
+[data-tilt] {
+	transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+	transition: transform 600ms var(--ease-out);
+}
+
+/* Magnetic elements move with `translate`, so their own transforms are untouched */
+[data-magnetic] {
+	transition: translate 500ms var(--ease-out);
+}
+
 /* Language switch cross-fade (native, no JS) */
 @view-transition {
 	navigation: auto;
@@ -275,8 +343,13 @@ html.is-locked {
 		transition-delay: 0ms !important;
 	}
 
-	.js [data-reveal] {
+	.js [data-reveal],
+	.js [data-reveal='words'] .word {
 		opacity: 1;
+		transform: none;
+	}
+
+	[data-tilt] {
 		transform: none;
 	}
 }

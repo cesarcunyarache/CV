@@ -1,0 +1,17 @@
+---
+/**
+ * Defines every brand logo once; BrandLogo references them with <use>,
+ * so repeated logos cost a few bytes instead of the full path each time.
+ */
+import { allBrandIcons } from './brand-icons';
+---
+
+<svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+	{
+		allBrandIcons().map((icon) => (
+			<symbol id={icon.id} viewBox="0 0 24 24">
+				<path d={icon.path} />
+			</symbol>
+		))
+	}
+</svg>

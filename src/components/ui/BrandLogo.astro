@@ -1,0 +1,60 @@
+---
+import { getBrandIcon } from './brand-icons';
+
+// Requires <BrandSprite /> once on the page.
+
+interface Props {
+	name: string;
+	size?: number;
+	class?: string;
+}
+
+const { name, size = 24, class: className } = Astro.props;
+const icon = getBrandIcon(name);
+---
+
+{
+	icon ? (
+		<svg
+			class:list={['brand-logo', className]}
+			style={icon.color ? `--brand: ${icon.color}` : undefined}
+			width={size}
+			height={size}
+			viewBox="0 0 24 24"
+			fill="currentColor"
+			aria-hidden="true"
+			focusable="false"
+		>
+			<use href={`#${icon.id}`} />
+		</svg>
+	) : (
+		<span class:list={['brand-logo brand-logo--monogram', className]} style={`--size: ${size}px`} aria-hidden="true">
+			{name.slice(0, 2)}
+		</span>
+	)
+}
+
+<style>
+	.brand-logo {
+		flex-shrink: 0;
+	}
+
+	.brand-logo--monogram {
+		display: inline-grid;
+		place-items: center;
+		width: var(--size);
+		height: var(--size);
+		border-radius: 28%;
+		background: currentColor;
+		font-size: calc(var(--size) * 0.42);
+		font-weight: 700;
+		line-height: 1;
+		letter-spacing: -0.02em;
+	}
+
+	/* Monogram text uses the background colour so it reads as a cut-out */
+	.brand-logo--monogram {
+		color: var(--text);
+		-webkit-text-fill-color: var(--bg);
+	}
+</style>

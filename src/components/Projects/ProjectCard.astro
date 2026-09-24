@@ -19,7 +19,7 @@ const links = [
 const meta = [project.category, project.year].filter(Boolean).join(' · ');
 ---
 
-<article class="card" aria-labelledby={titleId}>
+<article class="card" aria-labelledby={titleId} data-tilt data-spotlight>
 	<div class="card__body">
 		<p class="card__meta">
 			{meta}
@@ -81,7 +81,6 @@ const meta = [project.category, project.year].filter(Boolean).join(' · ');
 		border-radius: var(--radius-lg);
 		background: var(--surface);
 		overflow: hidden;
-		transition: transform var(--dur-component) var(--ease-out);
 	}
 
 	.card__body {

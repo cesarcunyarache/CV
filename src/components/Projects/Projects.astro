@@ -21,9 +21,9 @@ const projects = [...data.projects].sort((a, b) => Number(Boolean(b.featured)) -
 		<div class="work__viewport">
 			{
 				projects.length > 0 ? (
-					<ol class="work__track" data-horizontal-track data-reveal-group>
+					<ol class="work__track" data-horizontal-track data-reveal-group style={`--n: ${projects.length}`}>
 						{projects.map((project, i) => (
-							<li class="work__item" data-reveal>
+							<li class="work__item" data-reveal style={`--i: ${i}`}>
 								<ProjectCard project={project} index={i + 1} t={t} />
 							</li>
 						))}
@@ -109,9 +109,14 @@ const projects = [...data.projects].sort((a, b) => Number(Boolean(b.featured)) -
 			will-change: transform;
 		}
 
+		/* The card passing the centre of the track is slightly larger */
 		:global(.js) .work__item {
+			--pos: calc(var(--i) / max(1, var(--n) - 1));
+			--distance-to-focus: max(var(--progress) - var(--pos), var(--pos) - var(--progress));
+
 			width: clamp(26rem, 40vw, 38rem);
 			height: min(58svh, 38rem);
+			scale: calc(1 - min(0.07, var(--distance-to-focus) * 0.14));
 		}
 
 		:global(.js) .work__progress {

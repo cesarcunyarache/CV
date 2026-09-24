@@ -1,0 +1,68 @@
+---
+/**
+ * Decorative band of technology logos. Two rows move in opposite
+ * directions as the band crosses the viewport (scroll-linked, no autoplay).
+ */
+import BrandLogo from '../ui/BrandLogo.astro';
+
+interface Props {
+	items: string[];
+}
+
+const { items } = Astro.props;
+const rows = [items, [...items].reverse()];
+---
+
+<div class="marquee" data-progress="view" aria-hidden="true">
+	{
+		rows.map((items, r) => (
+			<div class="marquee__row" style={`--dir: ${r === 0 ? 1 : -1}`}>
+				{items.map((item) => (
+					<span class="marquee__item">
+						<BrandLogo name={item} size={34} />
+						{item}
+					</span>
+				))}
+			</div>
+		))
+	}
+</div>
+
+<style>
+	.marquee {
+		--progress: 0.5;
+
+		display: grid;
+		gap: 1.25rem;
+		margin-bottom: clamp(3rem, 2rem + 4vw, 5rem);
+		overflow: clip;
+		/* Fade the edges */
+		mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+	}
+
+	.marquee__row {
+		display: flex;
+		gap: clamp(2rem, 1rem + 3vw, 4rem);
+		width: max-content;
+		/* Centred on the viewport, then shifted with scroll progress */
+		transform: translate3d(calc(-50% + 50vw + (var(--progress) - 0.5) * var(--dir) * 45vw), 0, 0);
+		will-change: transform;
+	}
+
+	.marquee__item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75rem;
+		font-size: var(--fs-title);
+		font-weight: 600;
+		letter-spacing: -0.03em;
+		color: var(--text-secondary);
+		white-space: nowrap;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.marquee__row {
+			transform: translate3d(calc(-50% + 50vw), 0, 0);
+		}
+	}
+</style>

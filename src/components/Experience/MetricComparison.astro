@@ -12,10 +12,11 @@ interface Props {
 
 const { metric, locale, t } = Astro.props;
 const ratio = metric.after / metric.before;
+const blocks = metric.visual === 'blocks' ? Array.from({ length: metric.before }, (_, i) => i < metric.after) : [];
 const reduction = new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 1 }).format(1 - ratio);
 ---
 
-<div class="metric tile" data-reveal style={`--ratio: ${ratio}`}>
+<div class="metric tile" data-reveal data-spotlight style={`--ratio: ${ratio}`}>
 	<h4 class="metric__label">{metric.label}</h4>
 
 	<p class="metric__value">
@@ -28,16 +29,26 @@ const reduction = new Intl.NumberFormat(locale, { style: 'percent', maximumFract
 
 	<p class="metric__delta">−{reduction} {t.experience.reduction}</p>
 
-	<div class="metric__bars" aria-hidden="true">
-		<div class="metric__row">
-			<span>{t.experience.before}</span>
-			<span class="metric__bar"></span>
-		</div>
-		<div class="metric__row">
-			<span>{t.experience.after}</span>
-			<span class="metric__bar metric__bar--after"></span>
-		</div>
-	</div>
+	{
+		blocks.length > 0 ? (
+			<div class="metric__blocks" aria-hidden="true" style={`--count: ${blocks.length}`}>
+				{blocks.map((kept, i) => (
+					<span class:list={['metric__block', { 'is-kept': kept }]} style={`--b: ${i}`} />
+				))}
+			</div>
+		) : (
+			<div class="metric__bars" aria-hidden="true">
+				<div class="metric__row">
+					<span>{t.experience.before}</span>
+					<span class="metric__bar" />
+				</div>
+				<div class="metric__row">
+					<span>{t.experience.after}</span>
+					<span class="metric__bar metric__bar--after" />
+				</div>
+			</div>
+		)
+	}
 </div>
 
 <style>
@@ -129,5 +140,46 @@ const reduction = new Intl.NumberFormat(locale, { style: 'percent', maximumFract
 
 	:global(.js) .metric:not(:global(.is-visible)) .metric__bar--after {
 		transform: scaleX(1);
+	}
+
+	/* One block per unit: the removed ones fade to dashed outlines, the kept ones light up */
+	.metric__blocks {
+		display: grid;
+		grid-template-columns: repeat(var(--count), minmax(0, 1fr));
+		gap: 0.4rem;
+		margin-top: auto;
+		padding-top: 1.5rem;
+	}
+
+	.metric__block {
+		height: 2.25rem;
+		border-radius: 0.6rem;
+		background: var(--line);
+		outline: 1.5px dashed transparent;
+		outline-offset: -1.5px;
+		transition:
+			transform 800ms var(--ease-out),
+			background-color 600ms var(--ease-out),
+			outline-color 600ms var(--ease-out);
+		transition-delay: calc(400ms + var(--b) * 80ms);
+	}
+
+	.metric__block:not(.is-kept) {
+		background: transparent;
+		outline-color: var(--line);
+		transform: scale(0.88);
+	}
+
+	.metric__block.is-kept {
+		background: var(--accent-fill);
+		box-shadow: 0 10px 24px -10px rgb(10 108 230 / 0.6);
+		transition-delay: 1s;
+	}
+
+	:global(.js) .metric:not(:global(.is-visible)) .metric__block {
+		opacity: 1;
+		transform: none;
+		background: var(--line);
+		box-shadow: none;
 	}
 </style>

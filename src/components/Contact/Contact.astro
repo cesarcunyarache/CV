@@ -9,6 +9,7 @@ interface Props {
 
 const { data, t } = Astro.props.content;
 const { contact, contactSection, profile } = data;
+const titleWords = contactSection.title.split(' ');
 const stripProtocol = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '');
 
 const channels: { label: string; value: string; href: string; icon: IconName; external: boolean }[] = [
@@ -22,10 +23,20 @@ const channels: { label: string; value: string; href: string; icon: IconName; ex
 	<div class="container">
 		<div class="contact__intro">
 			<p class="contact__eyebrow" data-reveal>{t.contact.eyebrow}</p>
-			<h2 class="contact__title" id="contact-title" data-reveal>{contactSection.title}</h2>
+			<h2 class="contact__title" id="contact-title" data-reveal="words">
+				{
+					titleWords.map((word, i) => (
+						<>
+							<span class="word" style={`--w: ${i * 2}`}>
+								{word}
+							</span>{' '}
+						</>
+					))
+				}
+			</h2>
 			<p class="contact__description" data-reveal>{contactSection.description}</p>
 			<div class="contact__actions" data-reveal>
-				<Button href={`mailto:${contact.email}`} size="large">{t.contact.email}</Button>
+				<Button href={`mailto:${contact.email}`} size="large" data-magnetic>{t.contact.email}</Button>
 				<button class="contact__copy link" type="button" data-copy={contact.email} data-copied-label={t.contact.copied}>
 					<Icon name="copy" size={17} class="contact__copy-icon" />
 					<Icon name="check" size={17} class="contact__check-icon" />
@@ -40,6 +51,8 @@ const channels: { label: string; value: string; href: string; icon: IconName; ex
 					<li data-reveal>
 						<a
 							class="channel tile"
+							data-tilt
+							data-spotlight
 							href={channel.href}
 							target={channel.external ? '_blank' : undefined}
 							rel={channel.external ? 'noopener noreferrer' : undefined}
@@ -131,7 +144,6 @@ const channels: { label: string; value: string; href: string; icon: IconName; ex
 		display: grid;
 		gap: 0.2rem;
 		height: 100%;
-		transition: transform var(--dur-component) var(--ease-out);
 	}
 
 	.channel :global(.channel__icon) {
@@ -153,10 +165,6 @@ const channels: { label: string; value: string; href: string; icon: IconName; ex
 	}
 
 	@media (hover: hover) {
-		.channel:hover {
-			transform: scale(1.02);
-		}
-
 		.channel:hover :global(.channel__icon) {
 			color: var(--accent);
 		}

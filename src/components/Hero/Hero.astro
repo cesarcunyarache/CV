@@ -23,7 +23,7 @@ const social = [
  */
 ---
 
-<section class="hero" id="top" data-progress="sticky" aria-labelledby="hero-title">
+<section class="hero" id="top" data-progress="sticky" data-pointer-scene aria-labelledby="hero-title">
 	<div class="hero__stage">
 		<div class="hero__intro container">
 			{
@@ -42,7 +42,7 @@ const social = [
 			<p class="hero__summary">{profile.summary}</p>
 
 			<div class="hero__actions">
-				<Button href="#work" size="large">{t.hero.ctaWork}</Button>
+				<Button href="#work" size="large" data-magnetic>{t.hero.ctaWork}</Button>
 				<a class="link hero__link" href="#contact">
 					{t.hero.ctaContact}
 					<Icon name="chevron-right" size={18} class="chevron" />

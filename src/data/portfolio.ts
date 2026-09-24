@@ -67,6 +67,7 @@ export const portfolio: Portfolio = {
 
 	principles: [
 		{
+			icon: 'process',
 			title: { es: 'Entender el negocio', en: 'Understand the business' },
 			description: {
 				es: 'Analizo cómo funciona el proceso real antes de proponer una solución técnica.',
@@ -74,6 +75,7 @@ export const portfolio: Portfolio = {
 			},
 		},
 		{
+			icon: 'rules',
 			title: { es: 'Modelar las reglas', en: 'Model the rules' },
 			description: {
 				es: 'Convierto reglas de negocio en modelos y flujos explícitos, no en condiciones dispersas.',
@@ -81,6 +83,7 @@ export const portfolio: Portfolio = {
 			},
 		},
 		{
+			icon: 'architecture',
 			title: { es: 'Diseñar para cambiar', en: 'Design for change' },
 			description: {
 				es: 'Arquitectura modular, SOLID y Clean Code para que el sistema evolucione sin romperse.',
@@ -88,6 +91,7 @@ export const portfolio: Portfolio = {
 			},
 		},
 		{
+			icon: 'performance',
 			title: { es: 'Medir y optimizar', en: 'Measure and optimise' },
 			description: {
 				es: 'Optimizo consultas y tiempos de respuesta con datos, no con suposiciones.',
@@ -127,7 +131,13 @@ export const portfolio: Portfolio = {
 					en: 'Cost-centre processing optimisation.',
 				},
 				metrics: [
-					{ label: { es: 'Consultas', en: 'Queries' }, unit: { es: 'consultas', en: 'queries' }, before: 8, after: 1 },
+					{
+						label: { es: 'Consultas', en: 'Queries' },
+						unit: { es: 'consultas', en: 'queries' },
+						before: 8,
+						after: 1,
+						visual: 'blocks',
+					},
 					{ label: { es: 'Tiempo de respuesta', en: 'Response time' }, unit: { es: 'ms', en: 'ms' }, before: 244, after: 82 },
 				],
 			},
@@ -249,10 +259,10 @@ export const portfolio: Portfolio = {
 	],
 
 	certifications: [
-		{ name: 'CCNAv7: Switching, Routing and Wireless Essentials', issuer: 'Cisco Networking Academy' },
-		{ name: 'CCNAv7: Introduction to Networks', issuer: 'Cisco Networking Academy' },
-		{ name: 'PCAP: Programming Essentials in Python' },
-		{ name: 'Inspiring Study Conference with Google' },
+		{ name: 'CCNAv7: Switching, Routing and Wireless Essentials', icon: 'cisco', issuer: 'Cisco Networking Academy' },
+		{ name: 'CCNAv7: Introduction to Networks', icon: 'cisco', issuer: 'Cisco Networking Academy' },
+		{ name: 'PCAP: Programming Essentials in Python', icon: 'python' },
+		{ name: 'Inspiring Study Conference with Google', icon: 'google' },
 	],
 
 	languages: [

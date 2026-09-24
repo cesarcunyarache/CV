@@ -1,0 +1,320 @@
+---
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { localePath, type Locale } from '../../i18n/config';
+import type { Content } from '../../data';
+
+interface Props {
+	locale: Locale;
+	content: Content;
+}
+
+const { locale, content } = Astro.props;
+const { data, t } = content;
+const home = localePath(locale);
+const items = t.navItems.map((id) => ({ id, label: t.nav[id], href: `${home}#${id}` }));
+const [firstName, lastName] = data.profile.shortName.split(' ');
+---
+
+<div class="header-sentinel" data-header-sentinel aria-hidden="true"></div>
+<header class="header" data-header>
+	<div class="header__bar">
+		<a class="header__brand" href={`${home}#top`}>
+			<span class="header__mark" aria-hidden="true">{firstName.charAt(0)}</span>
+			<span class="header__name">
+				<span>{firstName}</span>
+				<span class="header__name-rest">{lastName}</span>
+			</span>
+		</a>
+
+		<nav class="header__nav" aria-label={t.a11y.mainNav}>
+			<ul class="header__list">
+				{
+					items.map((item) => (
+						<li>
+							<a class="header__link" href={item.href} data-nav-link>
+								{item.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+
+		<div class="header__actions">
+			<LanguageSwitcher current={locale} label={t.a11y.languageSwitcher} />
+			<button
+				class="header__toggle"
+				type="button"
+				aria-expanded="false"
+				aria-controls="mobile-menu"
+				aria-label={t.a11y.openMenu}
+				data-menu-toggle
+				data-label-open={t.a11y.openMenu}
+				data-label-close={t.a11y.closeMenu}
+			>
+				<span class="header__toggle-line" aria-hidden="true"></span>
+				<span class="header__toggle-line" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+
+	<div class="header__menu" id="mobile-menu">
+		<nav aria-label={t.a11y.mainNav}>
+			<ol class="header__menu-list">
+				{
+					items.map((item, index) => (
+						<li style={`--i: ${index}`}>
+							<a class="header__menu-link" href={item.href} data-nav-link>
+								<span class="label">{String(index + 1).padStart(2, '0')}</span>
+								{item.label}
+							</a>
+						</li>
+					))
+				}
+			</ol>
+		</nav>
+	</div>
+</header>
+
+<style>
+	.header-sentinel {
+		position: absolute;
+		top: 0;
+		height: 4rem;
+		width: 1px;
+	}
+
+	.header {
+		position: fixed;
+		inset: 0 0 auto;
+		z-index: 50;
+		padding: 1rem var(--gutter);
+		pointer-events: none;
+	}
+
+	.header__bar {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		max-width: calc(var(--container) - 2 * var(--gutter));
+		margin-inline: auto;
+		padding: 0.375rem 0.375rem 0.375rem 0.5rem;
+		border: 1px solid transparent;
+		border-radius: 999px;
+		pointer-events: auto;
+		transition:
+			max-width var(--dur-section) var(--ease-out),
+			background-color var(--dur-component) var(--ease-out),
+			border-color var(--dur-component) var(--ease-out);
+	}
+
+	/* Floating pill once the user scrolls */
+	.header.is-scrolled .header__bar,
+	.header.is-menu-open .header__bar {
+		max-width: 46rem;
+		background: rgb(17 17 19 / 0.72);
+		border-color: var(--line);
+		backdrop-filter: blur(16px) saturate(140%);
+		-webkit-backdrop-filter: blur(16px) saturate(140%);
+	}
+
+	.header__brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75rem;
+		min-height: 2.5rem;
+		font-weight: 500;
+		letter-spacing: -0.02em;
+	}
+
+	.header__mark {
+		display: grid;
+		place-items: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 50%;
+		background: var(--text);
+		color: var(--bg);
+		font-family: var(--font-serif);
+		font-style: italic;
+		font-size: 1.35rem;
+		line-height: 1;
+		transition: transform var(--dur-component) var(--ease-out);
+	}
+
+	.header__brand:hover .header__mark {
+		transform: rotate(-12deg) scale(1.05);
+	}
+
+	.header__name {
+		display: inline-flex;
+		gap: 0.3em;
+	}
+
+	.header__name-rest {
+		color: var(--text-muted);
+		transition:
+			opacity var(--dur-component) var(--ease-out),
+			width var(--dur-component) var(--ease-out);
+	}
+
+	.header.is-scrolled .header__name-rest {
+		display: none;
+	}
+
+	.header__list {
+		display: none;
+	}
+
+	.header__link {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		min-height: 2.5rem;
+		padding-inline: 0.9rem;
+		border-radius: 999px;
+		font-size: var(--step-meta);
+		color: var(--text-muted);
+		transition:
+			color var(--dur-micro) var(--ease-out),
+			background-color var(--dur-micro) var(--ease-out);
+	}
+
+	.header__link:hover {
+		color: var(--text);
+		background: rgb(255 255 255 / 0.05);
+	}
+
+	.header__link[aria-current] {
+		color: var(--text);
+	}
+
+	.header__link::after {
+		content: '';
+		position: absolute;
+		left: 50%;
+		bottom: 0.3rem;
+		width: 4px;
+		height: 4px;
+		border-radius: 50%;
+		background: var(--accent);
+		translate: -50% 0;
+		scale: 0;
+		transition: scale var(--dur-component) var(--ease-out);
+	}
+
+	.header__link[aria-current]::after {
+		scale: 1;
+	}
+
+	.header__actions {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.header__toggle {
+		display: grid;
+		place-content: center;
+		gap: 6px;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 50%;
+		background: rgb(255 255 255 / 0.06);
+	}
+
+	.header__toggle-line {
+		display: block;
+		width: 1.1rem;
+		height: 1.5px;
+		background: currentColor;
+		transition: transform var(--dur-component) var(--ease-out);
+	}
+
+	.header.is-menu-open .header__toggle-line:first-child {
+		transform: translateY(3.75px) rotate(45deg);
+	}
+
+	.header.is-menu-open .header__toggle-line:last-child {
+		transform: translateY(-3.75px) rotate(-45deg);
+	}
+
+	/* Mobile full-screen menu */
+	.header__menu {
+		position: fixed;
+		inset: 0;
+		z-index: 1;
+		display: flex;
+		align-items: flex-end;
+		padding: 6rem var(--gutter) 3rem;
+		background: var(--bg);
+		visibility: hidden;
+		opacity: 0;
+		pointer-events: none;
+		transition:
+			opacity var(--dur-component) var(--ease-out),
+			visibility 0s linear var(--dur-component);
+	}
+
+	.header.is-menu-open .header__menu {
+		visibility: visible;
+		opacity: 1;
+		pointer-events: auto;
+		transition: opacity var(--dur-component) var(--ease-out);
+	}
+
+	.header__menu nav {
+		width: 100%;
+	}
+
+	.header__menu-list li {
+		border-top: 1px solid var(--line);
+		opacity: 0;
+		transform: translateY(1rem);
+		transition:
+			opacity var(--dur-component) var(--ease-out),
+			transform var(--dur-component) var(--ease-out);
+		transition-delay: calc(var(--i) * 60ms + 100ms);
+	}
+
+	.header.is-menu-open .header__menu-list li {
+		opacity: 1;
+		transform: none;
+	}
+
+	.header__menu-link {
+		display: flex;
+		align-items: baseline;
+		gap: 1rem;
+		padding-block: 1rem;
+		font-size: clamp(2rem, 8vw, 3rem);
+		font-weight: 500;
+		letter-spacing: -0.04em;
+		line-height: 1.1;
+	}
+
+	.header__menu-link[aria-current] {
+		color: var(--accent);
+	}
+
+	@media (min-width: 48rem) {
+		.header__list {
+			display: flex;
+			gap: 0.125rem;
+		}
+
+		.header__toggle,
+		.header__menu {
+			display: none;
+		}
+	}
+
+	@media (max-width: 29.99rem) {
+		.header__name-rest {
+			display: none;
+		}
+	}
+</style>

@@ -1,0 +1,105 @@
+---
+import { defaultLocale, localeMeta, localePath, locales, type Locale } from '../i18n/config';
+import type { ResolvedPortfolio } from '../data';
+
+interface Props {
+	locale: Locale;
+	title: string;
+	description: string;
+	data: ResolvedPortfolio;
+	/** Adds hreflang alternates and JSON-LD. Off for utility pages like 404. */
+	indexable?: boolean;
+}
+
+const { locale, title, description, data, indexable = true } = Astro.props;
+const site = Astro.site ?? Astro.url;
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL('/og.png', site).href;
+const { profile, contact, experience, education, skills } = data;
+
+const person = {
+	'@type': 'Person',
+	'@id': new URL('/#person', site).href,
+	name: profile.name,
+	jobTitle: profile.role,
+	url: new URL('/', site).href,
+	sameAs: [contact.linkedin, contact.github],
+	address: {
+		'@type': 'PostalAddress',
+		addressLocality: profile.location.city,
+		addressCountry: profile.location.countryCode,
+	},
+	alumniOf: education.map((item) => ({ '@type': 'CollegeOrUniversity', name: item.institution })),
+	worksFor: experience
+		.filter((item) => !item.end)
+		.map((item) => ({ '@type': 'Organization', name: item.company })),
+	knowsAbout: skills.flatMap((group) => group.items.map((item) => item.name)),
+};
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'ProfilePage',
+			'@id': `${canonical}#profile`,
+			url: canonical,
+			name: title,
+			description,
+			inLanguage: localeMeta[locale].htmlLang,
+			mainEntity: { '@id': person['@id'] },
+		},
+		{
+			'@type': 'WebSite',
+			'@id': new URL('/#website', site).href,
+			url: new URL('/', site).href,
+			name: profile.shortName,
+			inLanguage: locales.map((item) => localeMeta[item].htmlLang),
+		},
+		person,
+	],
+};
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{!indexable && <meta name="robots" content="noindex" />}
+{
+	indexable && (
+		<>
+			{locales.map((item) => (
+				<link rel="alternate" hreflang={localeMeta[item].htmlLang} href={new URL(localePath(item), site).href} />
+			))}
+			<link rel="alternate" hreflang="x-default" href={new URL(localePath(defaultLocale), site).href} />
+		</>
+	)
+}
+
+<meta name="author" content={profile.name} />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="sitemap" href="/sitemap.xml" />
+
+<meta property="og:type" content="profile" />
+<meta property="og:site_name" content={profile.shortName} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={title} />
+<meta property="og:locale" content={localeMeta[locale].ogLocale} />
+{
+	locales
+		.filter((item) => item !== locale)
+		.map((item) => <meta property="og:locale:alternate" content={localeMeta[item].ogLocale} />)
+}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+{indexable && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}

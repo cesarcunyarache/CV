@@ -1,0 +1,119 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props extends HTMLAttributes<'a'> {
+	href: string;
+	variant?: 'primary' | 'ghost';
+	icon?: IconName;
+	magnetic?: boolean;
+	external?: boolean;
+	externalLabel?: string;
+}
+
+const { variant = 'ghost', icon, magnetic = false, external = false, externalLabel, class: className, ...rest } =
+	Astro.props;
+---
+
+<a
+	class:list={['button', `button--${variant}`, className]}
+	data-magnetic={magnetic || undefined}
+	target={external ? '_blank' : undefined}
+	rel={external ? 'noopener noreferrer' : undefined}
+	{...rest}
+>
+	<span class="button__text"><slot /></span>
+	{external && externalLabel && <span class="sr-only">{externalLabel}</span>}
+	{
+		icon && (
+			<span class="button__icon">
+				<Icon name={icon} size={16} />
+			</span>
+		)
+	}
+</a>
+
+<style>
+	.button {
+		--button-bg: transparent;
+		--button-fg: var(--text);
+		--button-border: var(--line-strong);
+
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75rem;
+		min-height: 3rem;
+		padding: 0.5rem 0.5rem 0.5rem 1.35rem;
+		border: 1px solid var(--button-border);
+		border-radius: 999px;
+		background: var(--button-bg);
+		color: var(--button-fg);
+		font-size: var(--step-meta);
+		font-weight: 500;
+		letter-spacing: -0.01em;
+		white-space: nowrap;
+		overflow: hidden;
+		isolation: isolate;
+		transition:
+			transform var(--dur-component) var(--ease-out),
+			border-color var(--dur-micro) var(--ease-out),
+			color var(--dur-micro) var(--ease-out);
+	}
+
+	.button:not(:has(.button__icon)) {
+		padding-right: 1.35rem;
+	}
+
+	/* Fill that grows from the bottom on hover */
+	.button::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: var(--button-fill, var(--text));
+		transform: translateY(101%);
+		border-radius: inherit;
+		transition: transform var(--dur-component) var(--ease-out);
+	}
+
+	.button:hover::before,
+	.button:focus-visible::before {
+		transform: none;
+	}
+
+	.button:hover,
+	.button:focus-visible {
+		--button-fg: var(--bg);
+		border-color: transparent;
+	}
+
+	.button:active {
+		scale: 0.97;
+	}
+
+	.button--primary {
+		--button-bg: var(--accent);
+		--button-fg: var(--accent-contrast);
+		--button-border: transparent;
+		--button-fill: var(--text);
+	}
+
+	.button__icon {
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 50%;
+		background: rgb(255 255 255 / 0.08);
+		transition: transform var(--dur-component) var(--ease-out);
+	}
+
+	.button--primary .button__icon {
+		background: rgb(0 0 0 / 0.12);
+	}
+
+	.button:hover .button__icon {
+		transform: rotate(45deg);
+	}
+</style>

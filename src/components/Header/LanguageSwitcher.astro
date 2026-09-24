@@ -1,0 +1,60 @@
+---
+import { localeMeta, localePath, locales, type Locale } from '../../i18n/config';
+
+interface Props {
+	current: Locale;
+	label: string;
+}
+
+const { current, label } = Astro.props;
+---
+
+<nav class="lang" aria-label={label}>
+	{
+		locales.map((locale) => (
+			<a
+				class="lang__link"
+				href={localePath(locale)}
+				hreflang={localeMeta[locale].htmlLang}
+				lang={localeMeta[locale].htmlLang}
+				aria-current={locale === current ? 'page' : undefined}
+				title={localeMeta[locale].name}
+			>
+				<span class="sr-only">{localeMeta[locale].name}</span>
+				<span aria-hidden="true">{localeMeta[locale].label}</span>
+			</a>
+		))
+	}
+</nav>
+
+<style>
+	.lang {
+		display: flex;
+		align-items: center;
+		font-family: var(--font-mono);
+		font-size: var(--step-label);
+		letter-spacing: 0.1em;
+	}
+
+	.lang__link {
+		display: grid;
+		place-items: center;
+		min-width: 2.5rem;
+		min-height: 2.5rem;
+		color: var(--text-dim);
+		transition: color var(--dur-micro) var(--ease-out);
+	}
+
+	.lang__link + .lang__link {
+		border-left: 1px solid var(--line-strong);
+		min-width: 2.75rem;
+	}
+
+	.lang__link:hover {
+		color: var(--text);
+	}
+
+	.lang__link[aria-current='page'] {
+		color: var(--accent);
+	}
+</style>

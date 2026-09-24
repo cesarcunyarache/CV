@@ -1,0 +1,60 @@
+---
+import { Font } from 'astro:assets';
+import SEO from '../components/SEO.astro';
+import { localeMeta, type Locale } from '../i18n/config';
+import type { Content } from '../data';
+import '../styles/global.css';
+
+interface Props {
+	locale: Locale;
+	content: Content;
+	title: string;
+	description: string;
+	indexable?: boolean;
+}
+
+const { locale, content, title, description, indexable } = Astro.props;
+---
+
+<!doctype html>
+<html lang={localeMeta[locale].htmlLang}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<script is:inline>
+			document.documentElement.classList.add('js');
+		</script>
+		<Font cssVariable="--font-sans" preload />
+		<Font cssVariable="--font-mono" />
+		<Font cssVariable="--font-serif" />
+		<SEO locale={locale} title={title} description={description} data={content.data} indexable={indexable} />
+	</head>
+	<body>
+		<a class="skip-link" href="#main">{content.t.a11y.skipToContent}</a>
+		<slot />
+		<script>
+			import '../scripts/main.ts';
+		</script>
+	</body>
+</html>
+
+<style>
+	.skip-link {
+		position: fixed;
+		top: 1rem;
+		left: 1rem;
+		z-index: 200;
+		padding: 0.75rem 1rem;
+		border-radius: var(--radius-sm);
+		background: var(--accent);
+		color: var(--accent-contrast);
+		font-weight: 500;
+		transform: translateY(-200%);
+		transition: transform var(--dur-micro) var(--ease-out);
+	}
+
+	.skip-link:focus-visible {
+		transform: none;
+	}
+</style>

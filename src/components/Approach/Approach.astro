@@ -1,0 +1,155 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+import type { Content } from '../../data';
+
+interface Props {
+	content: Content;
+	index: number;
+}
+
+const { content, index } = Astro.props;
+const { data, t } = content;
+---
+
+<section class="approach section" id="approach" aria-labelledby="approach-title">
+	<div class="approach__inner container">
+		<div class="approach__aside">
+			<SectionHeading
+				index={index}
+				label={t.nav.approach}
+				title={t.sectionTitles.approach}
+				intro={t.approach.intro}
+				id="approach-title"
+			/>
+		</div>
+
+		<div class="approach__track" data-progress="view">
+			<span class="approach__rail" aria-hidden="true"></span>
+			<ol class="approach__steps">
+			{
+				data.principles.map((principle, i) => (
+					<li class="approach__step" data-reveal>
+						<span class="approach__dot" aria-hidden="true" />
+						<div class="approach__step-meta label">
+							<span class="approach__number">{String(i + 1).padStart(2, '0')}</span>
+							<span>{principle.tag}</span>
+						</div>
+						<h3 class="approach__title">{principle.title}</h3>
+						<p class="approach__description">{principle.description}</p>
+					</li>
+				))
+			}
+			</ol>
+		</div>
+	</div>
+</section>
+
+<style>
+	.approach {
+		background: linear-gradient(180deg, transparent, var(--bg-elevated) 20%, var(--bg-elevated) 80%, transparent);
+	}
+
+	.approach__inner {
+		display: grid;
+		gap: 2rem;
+	}
+
+	.approach__track {
+		position: relative;
+		padding-left: 2.5rem;
+	}
+
+	.approach__steps {
+		display: grid;
+		gap: clamp(3rem, 2rem + 4vw, 6rem);
+	}
+
+	/* Rail that fills as the list scrolls through the viewport */
+	.approach__rail {
+		position: absolute;
+		left: 0.3rem;
+		top: 0.5rem;
+		bottom: 0.5rem;
+		width: 1px;
+		background: var(--line-strong);
+	}
+
+	.approach__rail::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(var(--accent), rgb(255 106 61 / 0.2));
+		transform-origin: top;
+		transform: scaleY(clamp(0, calc(var(--progress, 1) * 1.8 - 0.35), 1));
+	}
+
+	.approach__step {
+		position: relative;
+		display: grid;
+		gap: 0.75rem;
+		max-width: 34rem;
+	}
+
+	.approach__dot {
+		position: absolute;
+		left: calc(-2.5rem + 0.3rem - 0.3125rem);
+		top: 0.2rem;
+		width: 0.625rem;
+		height: 0.625rem;
+		border-radius: 50%;
+		border: 1px solid var(--line-strong);
+		background: var(--bg-elevated);
+		transition:
+			background-color var(--dur-component) var(--ease-out) 400ms,
+			border-color var(--dur-component) var(--ease-out) 400ms;
+	}
+
+	.approach__step.is-visible .approach__dot,
+	:global(html:not(.js)) .approach__dot {
+		background: var(--accent);
+		border-color: var(--accent);
+	}
+
+	.approach__step-meta {
+		display: flex;
+		gap: 1rem;
+	}
+
+	.approach__number {
+		color: var(--accent);
+	}
+
+	.approach__title {
+		font-size: var(--step-h2);
+	}
+
+	.approach__description {
+		color: var(--text-muted);
+		font-size: var(--step-lead);
+		line-height: 1.5;
+	}
+
+	@media (min-width: 64rem) {
+		.approach__inner {
+			grid-template-columns: 5fr 6fr;
+			gap: 4rem;
+		}
+
+		.approach__aside {
+			position: sticky;
+			top: calc(var(--header-height) + 3rem);
+			align-self: start;
+		}
+
+		.approach__track {
+			padding-top: 10vh;
+			padding-bottom: 10vh;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.approach__rail::after {
+			transform: none;
+		}
+	}
+</style>

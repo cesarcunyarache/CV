@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/ui/Button.astro';
+import { getContent } from '../data';
+import { defaultLocale, localePath } from '../i18n/config';
+
+const content = getContent(defaultLocale);
+const { t } = content;
+---
+
+<BaseLayout
+	locale={defaultLocale}
+	content={content}
+	title={`404 — ${t.notFound.title}`}
+	description={t.notFound.description}
+	indexable={false}
+>
+	<main id="main" class="not-found container">
+		<p class="label">Error 404</p>
+		<h1 class="not-found__title">{t.notFound.title}</h1>
+		<p class="not-found__text">{t.notFound.description}</p>
+		<Button href={localePath(defaultLocale)} variant="primary" icon="arrow-right">{t.notFound.back}</Button>
+	</main>
+</BaseLayout>
+
+<style>
+	.not-found {
+		min-height: 100svh;
+		display: grid;
+		align-content: center;
+		justify-items: start;
+		gap: 1.5rem;
+	}
+
+	.not-found__title {
+		font-size: var(--step-h1);
+	}
+
+	.not-found__text {
+		color: var(--text-muted);
+		font-size: var(--step-lead);
+	}
+</style>

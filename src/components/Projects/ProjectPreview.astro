@@ -1,0 +1,109 @@
+---
+/**
+ * Generated schematic used when a project has no image: the project's
+ * technologies drawn as modules of a small system diagram.
+ */
+interface Props {
+	index: number;
+	category: string;
+	technologies: string[];
+}
+
+const { index, category, technologies } = Astro.props;
+const modules = technologies.slice(0, 4);
+---
+
+<div class="preview" aria-hidden="true">
+	<span class="preview__index">{String(index).padStart(2, '0')}</span>
+	<span class="preview__category label">{category}</span>
+	<div class="preview__diagram">
+		<span class="preview__core">{modules[0] ?? 'CORE'}</span>
+		<div class="preview__modules">
+			{modules.slice(1).map((module, i) => <span style={`--i: ${i}`}>{module}</span>)}
+		</div>
+	</div>
+</div>
+
+<style>
+	.preview {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		padding: 1.25rem;
+		background:
+			radial-gradient(circle at var(--mx, 70%) var(--my, 30%), rgb(255 106 61 / 0.14), transparent 45%),
+			linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 2rem 2rem,
+			linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 2rem 2rem,
+			var(--bg-elevated);
+	}
+
+	.preview__index {
+		position: absolute;
+		right: 1rem;
+		bottom: -0.15em;
+		font-size: clamp(5rem, 4rem + 5vw, 9rem);
+		font-weight: 500;
+		line-height: 1;
+		letter-spacing: -0.06em;
+		color: transparent;
+		-webkit-text-stroke: 1px var(--line-strong);
+		transition: transform var(--dur-section) var(--ease-out);
+	}
+
+	.preview__category {
+		align-self: start;
+	}
+
+	.preview__diagram {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 2.5rem;
+		transition: transform var(--dur-section) var(--ease-out);
+	}
+
+	.preview__diagram span {
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		letter-spacing: 0.08em;
+		padding: 0.5rem 0.75rem;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--line-strong);
+		background: var(--bg);
+		white-space: nowrap;
+	}
+
+	.preview__core {
+		position: relative;
+		border-color: rgb(255 106 61 / 0.6) !important;
+		color: var(--accent);
+		box-shadow: 0 0 40px -8px rgb(255 106 61 / 0.5);
+	}
+
+	.preview__core::after {
+		content: '';
+		position: absolute;
+		left: 100%;
+		top: 50%;
+		width: 2.5rem;
+		height: 1px;
+		background: linear-gradient(90deg, var(--accent), var(--line-strong));
+	}
+
+	.preview__modules {
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.preview__modules span {
+		color: var(--text-muted);
+		transform: translateX(calc(var(--i) * 0.75rem));
+	}
+
+	.preview__modules:empty,
+	.preview__diagram:has(.preview__modules:empty) .preview__core::after {
+		display: none;
+	}
+</style>

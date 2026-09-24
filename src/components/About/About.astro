@@ -1,0 +1,161 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+import type { Content } from '../../data';
+
+interface Props {
+	content: Content;
+	index: number;
+}
+
+const { content, index } = Astro.props;
+const { data, t } = content;
+const { about, languages } = data;
+const words = about.statement.split(' ');
+---
+
+<section class="about section" id="about" aria-labelledby="about-title">
+	<div class="container">
+		<SectionHeading index={index} label={t.sectionTitles.about} />
+
+		<h2 class="sr-only" id="about-title">{t.sectionTitles.about}</h2>
+		<p class="about__statement" data-progress="view" style={`--n: ${words.length}`}>
+			{words.map((word, i) => <span style={`--i: ${i}`}>{word} </span>)}
+		</p>
+
+		<div class="about__body">
+			<div class="about__text" data-reveal-group>
+				{about.paragraphs.map((paragraph) => <p data-reveal>{paragraph}</p>)}
+			</div>
+
+			<dl class="about__facts" data-reveal-group>
+				{
+					about.facts.map((fact) => (
+						<div class="about__fact" data-reveal>
+							<dt class="label">{fact.label}</dt>
+							<dd>{fact.value}</dd>
+						</div>
+					))
+				}
+			</dl>
+
+			<div class="about__languages" data-reveal>
+				<h3 class="label">{t.about.languages}</h3>
+				<ul>
+					{
+						languages.map((language) => (
+							<li class="about__language" style={`--level: ${language.proficiency}`}>
+								<span>{language.name}</span>
+								<span class="about__level">{language.level}</span>
+								<span class="about__meter" aria-hidden="true" />
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.about__statement {
+		max-width: 22ch;
+		font-size: var(--step-h2);
+		font-weight: 500;
+		line-height: 1.12;
+		letter-spacing: -0.035em;
+	}
+
+	.js .about__statement span {
+		/* Words light up between 20% and 65% of the block's trip through the viewport */
+		opacity: clamp(0.14, calc((var(--progress, 0) * 2.2 - 0.45) * var(--n) - var(--i)), 1);
+		transition: opacity 150ms linear;
+	}
+
+	.about__body {
+		display: grid;
+		gap: 3rem;
+		margin-top: clamp(4rem, 3rem + 5vw, 8rem);
+		padding-top: 3rem;
+		border-top: 1px solid var(--line);
+	}
+
+	.about__text {
+		display: grid;
+		gap: 1.25rem;
+		max-width: 38rem;
+		font-size: var(--step-lead);
+		color: var(--text-muted);
+		line-height: 1.55;
+	}
+
+	.about__facts {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	.about__fact dd {
+		margin-top: 0.35rem;
+		font-size: var(--step-h3);
+		letter-spacing: -0.02em;
+		line-height: 1.2;
+	}
+
+	.about__languages ul {
+		display: grid;
+		gap: 1.25rem;
+		margin-top: 1rem;
+	}
+
+	.about__language {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		gap: 0.5rem;
+	}
+
+	.about__level {
+		font-family: var(--font-mono);
+		font-size: var(--step-label);
+		color: var(--text-muted);
+		align-self: center;
+		letter-spacing: 0.06em;
+	}
+
+	.about__meter {
+		grid-column: 1 / -1;
+		height: 2px;
+		background: var(--line);
+		position: relative;
+		overflow: hidden;
+	}
+
+	.about__meter::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: var(--text);
+		transform-origin: left;
+		transform: scaleX(var(--level));
+		transition: transform 1.4s var(--ease-out) 300ms;
+	}
+
+	.js .about__languages:not(.is-visible) .about__meter::after {
+		transform: scaleX(0);
+	}
+
+	@media (min-width: 64rem) {
+		.about__statement {
+			margin-left: 16.666%;
+		}
+
+		.about__body {
+			grid-template-columns: 2fr 1fr 1fr;
+			margin-left: 16.666%;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.js .about__statement span {
+			opacity: 1;
+		}
+	}
+</style>

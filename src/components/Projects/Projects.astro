@@ -1,0 +1,179 @@
+---
+import ProjectCard from './ProjectCard.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import type { Content } from '../../data';
+
+interface Props {
+	content: Content;
+	index: number;
+}
+
+const { content, index } = Astro.props;
+const { data, t } = content;
+// Featured projects first, then the rest in their original order.
+const projects = [...data.projects].sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
+---
+
+<section class="work" id="work" aria-labelledby="work-title" data-horizontal data-progress="sticky">
+	<div class="work__sticky">
+		<div class="work__track" data-horizontal-track>
+			<div class="work__intro">
+				<SectionHeading
+					index={index}
+					label={t.nav.work}
+					title={t.sectionTitles.work}
+					intro={t.work.intro}
+					id="work-title"
+				/>
+				{
+					projects.length > 1 && (
+						<p class="work__hint label" aria-hidden="true">
+							{t.work.dragHint}
+							<span class="work__hint-line" />
+						</p>
+					)
+				}
+			</div>
+
+			{
+				projects.length > 0 ? (
+					<ol class="work__list" data-reveal-group>
+						{projects.map((project, i) => (
+							<li class="work__item" data-reveal="scale">
+								<ProjectCard project={project} index={i + 1} t={t} />
+							</li>
+						))}
+					</ol>
+				) : (
+					<p class="work__empty">{t.work.empty}</p>
+				)
+			}
+		</div>
+
+		<div class="work__progress" aria-hidden="true">
+			<span class="work__progress-bar"></span>
+		</div>
+	</div>
+</section>
+
+<style>
+	.work {
+		--progress: 0;
+		--distance: 0px;
+
+		position: relative;
+		padding-block: var(--space-section);
+		overflow-x: clip;
+	}
+
+	.work__track {
+		display: grid;
+		gap: 3rem;
+		padding-inline: var(--gutter);
+		max-width: var(--container);
+		margin-inline: auto;
+	}
+
+	.work__list {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	.work__hint,
+	.work__progress {
+		display: none;
+	}
+
+	.work__empty {
+		max-width: 32ch;
+		font-size: var(--step-lead);
+		color: var(--text-muted);
+	}
+
+	@media (min-width: 48rem) {
+		.work__list {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	/* Desktop with JS: vertical scroll drives a horizontal track */
+	@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+		:global(.js) .work {
+			padding-block: 0;
+		}
+
+		:global(.js) .work__sticky {
+			position: sticky;
+			top: 0;
+			height: 100svh;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			overflow: hidden;
+		}
+
+		:global(.js) .work__track {
+			display: flex;
+			align-items: stretch;
+			gap: 2rem;
+			width: max-content;
+			max-width: none;
+			margin: 0;
+			padding-inline: max(var(--gutter), (100vw - var(--container)) / 2 + var(--gutter));
+			transform: translate3d(calc(var(--progress) * var(--distance) * -1), 0, 0);
+			will-change: transform;
+		}
+
+		:global(.js) .work__intro {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			width: min(34rem, 36vw);
+			padding-block: 1rem;
+		}
+
+		:global(.js) .work__intro :global(.section-heading) {
+			margin-bottom: 0;
+		}
+
+		:global(.js) .work__list {
+			display: flex;
+			gap: 2rem;
+		}
+
+		:global(.js) .work__item {
+			width: clamp(26rem, 38vw, 40rem);
+			height: min(70svh, 44rem);
+		}
+
+		:global(.js) .work__hint {
+			display: inline-flex;
+			align-items: center;
+			gap: 1rem;
+		}
+
+		.work__hint-line {
+			width: 4rem;
+			height: 1px;
+			background: linear-gradient(90deg, var(--accent), transparent);
+		}
+
+		:global(.js) .work__progress {
+			display: block;
+			position: absolute;
+			left: max(var(--gutter), (100vw - var(--container)) / 2 + var(--gutter));
+			right: max(var(--gutter), (100vw - var(--container)) / 2 + var(--gutter));
+			bottom: 2.5rem;
+			height: 1px;
+			background: var(--line);
+		}
+
+		.work__progress-bar {
+			position: absolute;
+			inset: 0;
+			background: var(--accent);
+			transform-origin: left;
+			transform: scaleX(var(--progress));
+		}
+	}
+</style>

@@ -1,0 +1,133 @@
+---
+import type { Locale } from '../../i18n/config';
+import type { ResolvedPortfolio, UI } from '../../data';
+
+type Metric = NonNullable<ResolvedPortfolio['experience'][number]['caseStudy']>['metrics'][number];
+
+interface Props {
+	metric: Metric;
+	locale: Locale;
+	t: UI;
+}
+
+const { metric, locale, t } = Astro.props;
+const ratio = metric.after / metric.before;
+const reduction = new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 1 }).format(1 - ratio);
+---
+
+<div class="metric" data-reveal style={`--ratio: ${ratio}`}>
+	<div class="metric__head">
+		<h4 class="metric__label label">{metric.label}</h4>
+		<p class="metric__delta">−{reduction} <span>{t.experience.reduction}</span></p>
+	</div>
+
+	<p class="metric__value">
+		<span class="sr-only">{t.experience.before}: {metric.before} {metric.unit}. {t.experience.after}:</span>
+		<span class="metric__number" aria-hidden="true" data-count-from={metric.before}>{metric.after}</span>
+		<span class="sr-only">{metric.after}</span>
+		<span class="metric__unit">{metric.unit}</span>
+	</p>
+
+	<div class="metric__bars" aria-hidden="true">
+		<div class="metric__row">
+			<span class="metric__row-label">{t.experience.before}</span>
+			<span class="metric__bar metric__bar--before"></span>
+			<span class="metric__row-value">{metric.before}</span>
+		</div>
+		<div class="metric__row">
+			<span class="metric__row-label">{t.experience.after}</span>
+			<span class="metric__bar metric__bar--after"></span>
+			<span class="metric__row-value">{metric.after}</span>
+		</div>
+	</div>
+</div>
+
+<style>
+	.metric {
+		display: grid;
+		gap: 1.25rem;
+		padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+		border: 1px solid var(--line);
+		border-radius: var(--radius-lg);
+		background: var(--surface);
+	}
+
+	.metric__head {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 1rem;
+	}
+
+	.metric__label {
+		font-weight: 500;
+	}
+
+	.metric__delta {
+		font-family: var(--font-mono);
+		font-size: var(--step-meta);
+		color: var(--accent);
+	}
+
+	.metric__delta span {
+		color: var(--text-muted);
+	}
+
+	.metric__value {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		line-height: 1;
+	}
+
+	.metric__number {
+		font-size: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+		font-weight: 500;
+		letter-spacing: -0.05em;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.metric__unit {
+		font-family: var(--font-mono);
+		color: var(--text-muted);
+	}
+
+	.metric__bars {
+		display: grid;
+		gap: 0.6rem;
+	}
+
+	.metric__row {
+		display: grid;
+		grid-template-columns: 4.5rem 1fr 2.5rem;
+		align-items: center;
+		gap: 0.75rem;
+		font-family: var(--font-mono);
+		font-size: var(--step-label);
+		letter-spacing: 0.06em;
+		color: var(--text-muted);
+	}
+
+	.metric__row-value {
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.metric__bar {
+		height: 0.5rem;
+		border-radius: 999px;
+		background: var(--line-strong);
+		transform-origin: left;
+	}
+
+	/* The "after" bar shrinks from the "before" length to its real ratio */
+	.metric__bar--after {
+		background: var(--accent);
+		transform: scaleX(var(--ratio));
+		transition: transform 1.6s var(--ease-out) 300ms;
+	}
+
+	:global(.js) .metric:not(.is-visible) .metric__bar--after {
+		transform: scaleX(1);
+	}
+</style>

@@ -1,0 +1,145 @@
+---
+/**
+ * Signature visual: the layers of a business system rendered in CSS 3D.
+ * Layers separate as the hero scrolls away (`--progress`) and follow the
+ * pointer subtly (`--px`, `--py`). Purely decorative.
+ */
+interface Props {
+	layers: readonly string[];
+	label: string;
+}
+
+const { layers, label } = Astro.props;
+const coreIndex = Math.min(2, layers.length - 1);
+---
+
+<figure class="stack" role="img" aria-label={label} data-parallax-pointer>
+	<div class="stack__scene" aria-hidden="true">
+		{
+			layers.map((layer, index) => (
+				<div class:list={['stack__layer', { 'is-core': index === coreIndex }]} style={`--z: ${layers.length - 1 - index}`}>
+					<span class="stack__index">{`L${String(index + 1).padStart(2, '0')}`}</span>
+					<span class="stack__name">{layer}</span>
+					<span class="stack__node" />
+				</div>
+			))
+		}
+	</div>
+</figure>
+
+<style>
+	.stack {
+		--px: 0;
+		--py: 0;
+		--gap: clamp(2.75rem, 2rem + 2.5vw, 4.5rem);
+
+		position: relative;
+		display: grid;
+		place-items: center;
+		aspect-ratio: 1;
+		width: 100%;
+		max-width: 36rem;
+		perspective: 1600px;
+	}
+
+	.stack__scene {
+		position: relative;
+		width: 62%;
+		aspect-ratio: 1;
+		transform-style: preserve-3d;
+		transform: rotateX(calc(58deg + var(--py) * -6deg)) rotateZ(calc(-42deg + var(--px) * 8deg));
+		transition: transform 1.2s var(--ease-out);
+	}
+
+	.stack__layer {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		padding: 1rem 1.15rem;
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius);
+		background:
+			linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 12.5% 12.5%,
+			linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 12.5% 12.5%,
+			rgb(22 22 25 / 0.82);
+		/* Layers drift apart as the hero scrolls out of view */
+		transform: translateZ(calc(var(--z) * var(--gap) * (1 + var(--progress, 0) * 1.4) - 1.5 * var(--gap)));
+		box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.8);
+		animation: stack-in 1.4s var(--ease-out) both;
+		animation-delay: calc(400ms + var(--z) * 110ms);
+	}
+
+	.stack__layer.is-core {
+		border-color: rgb(255 106 61 / 0.55);
+		background:
+			radial-gradient(circle at 70% 65%, rgb(255 106 61 / 0.28), transparent 55%),
+			linear-gradient(rgb(255 106 61 / 0.12) 1px, transparent 1px) 0 0 / 12.5% 12.5%,
+			linear-gradient(90deg, rgb(255 106 61 / 0.12) 1px, transparent 1px) 0 0 / 12.5% 12.5%,
+			rgb(24 18 16 / 0.9);
+		box-shadow:
+			0 0 80px -10px rgb(255 106 61 / 0.35),
+			0 30px 60px -20px rgb(0 0 0 / 0.8);
+	}
+
+	.stack__index,
+	.stack__name {
+		font-family: var(--font-mono);
+		font-size: 0.625rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+	}
+
+	.stack__name {
+		align-self: flex-end;
+		color: var(--text);
+		font-size: 0.6875rem;
+	}
+
+	.is-core .stack__index,
+	.is-core .stack__name {
+		color: var(--accent);
+	}
+
+	.stack__node {
+		position: absolute;
+		left: 70%;
+		top: 65%;
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--text-dim);
+		translate: -50% -50%;
+	}
+
+	.is-core .stack__node {
+		background: var(--accent);
+		box-shadow: 0 0 0 0 rgb(255 106 61 / 0.6);
+		animation: pulse 2.4s var(--ease-out) infinite;
+	}
+
+	@keyframes stack-in {
+		from {
+			opacity: 0;
+			transform: translateZ(calc(var(--z) * var(--gap) * 3 - 1.5 * var(--gap)));
+		}
+	}
+
+	@keyframes pulse {
+		to {
+			box-shadow: 0 0 0 14px rgb(255 106 61 / 0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.stack__scene {
+			transform: rotateX(58deg) rotateZ(-42deg);
+		}
+
+		.stack__layer {
+			transform: translateZ(calc(var(--z) * var(--gap) - 1.5 * var(--gap)));
+		}
+	}
+</style>
